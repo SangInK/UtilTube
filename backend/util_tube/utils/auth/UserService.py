@@ -1,0 +1,81 @@
+from uuid import uuid4
+from datetime import datetime, timedelta
+
+from google_oauth.models import User
+
+
+class UserService:
+    def __init__(self, **kwargs):
+        if "user_token" in kwargs:
+            self.set_user(user_token=kwargs["user_token"])
+
+    def set_user(self, **kwargs):
+        data = None
+        queryset = None
+
+        try:
+            if "user_token" in kwargs:
+                queryset = User.objects.get(user_token=kwargs["user_token"])
+
+            serializer = UserSerializer(queryset)
+            data = serializer.data
+
+        except Exception as e:
+            data = None
+            queryset = None
+
+        self.data = data
+        self.queryset = queryset
+
+    def is_valid(self):
+        valid = False
+
+        if self.data is not None:
+            valid = True
+
+        return valid
+
+    def check_expires(self):
+        valid = False
+
+        if (
+            datetime.strptime(self.data["expires_at"], "%Y-%m-%dT%H:%M:%S.%f")
+            >= datetime.now()
+        ):
+            valid = True
+
+        return valid
+
+    def delete_user(self):
+        self.queryset.delete()
+
+    def update_user(self, **kwargs):
+        serializer = UserSerializer(instance=self.queryset, data=kwargs, partial=True)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+    def crate_uaer(self, google_user_id):
+        self.set_user(google_user_id=google_user_id)
+
+        if self.is_valid():
+            self.update_user(
+                user_token=str(uuid4()),
+                user_state=True,
+                expires_at=datetime.now() + timedelta(days=1),
+            )
+        else:
+            user = {
+                "google_user": google_user_id,
+                "user_token": str(uuid4()),
+                "user_state": True,
+                "expires_at": datetime.now() + timedelta(days=1),
+            }
+
+            serializer = UserSerializer(data=user)
+
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+
+            self.data = serializer.data
+            self.queryset = User.objects.get(google_user=google_user_id)
