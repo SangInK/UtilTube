@@ -268,7 +268,7 @@ class user_revoke(APIView):
             credentials.google_user.delete_user()
 
             response = Response()
-            response = self._delete_cookie()
+            response = _delete_cookie(response)
 
             response.status_code = status.HTTP_200_OK
 
