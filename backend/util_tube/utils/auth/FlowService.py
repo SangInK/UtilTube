@@ -78,9 +78,6 @@ class FlowService:
     def get_credentials(self):
         credentials = self._flow.credentials
 
-        return self._credentials_to_dict(credentials)
-
-    def _credentials_to_dict(self, credentials):
         return {
             "token": credentials.token,
             "refresh_token": credentials.refresh_token,

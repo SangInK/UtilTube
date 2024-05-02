@@ -22,7 +22,7 @@ SECRET_KEY = "django-insecure-0&mgxwbd-^@uf-pje8i!&$-6+a!*1th9q0_%jeid8@u-j=e=j)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "liberal-chigger-blindly.ngrok-free.app", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "liberal-chigger-blindly.ngrok-free.app"]
 
 
 # Application definition
@@ -62,6 +62,11 @@ CORS_ALLOW_HEADERS = (
     "ngrok-skip-browser-warning",
     "Set-Cookie",
 )
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

@@ -2,6 +2,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 
 from google_oauth.models import User
+from google_oauth.serializers import UserSerializer
 
 
 class UserService:
@@ -17,8 +18,9 @@ class UserService:
             if "user_token" in kwargs:
                 queryset = User.objects.get(user_token=kwargs["user_token"])
 
-            serializer = UserSerializer(queryset)
-            data = serializer.data
+            if queryset is not None:
+                serializer = UserSerializer(queryset)
+                data = serializer.data
 
         except Exception as e:
             data = None
@@ -55,7 +57,7 @@ class UserService:
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
-    def crate_uaer(self, google_user_id):
+    def create_user(self, google_user_id):
         self.set_user(google_user_id=google_user_id)
 
         if self.is_valid():

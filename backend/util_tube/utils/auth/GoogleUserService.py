@@ -1,4 +1,5 @@
 from google_oauth.models import GoogleUser
+from google_oauth.serializers import GoogleUserSerializer
 
 
 class GoogleUserService:
@@ -26,8 +27,9 @@ class GoogleUserService:
             elif "user_id" in kwargs:
                 queryset = GoogleUser.objects.get(user_id=kwargs["user_id"])
 
-            serializer = GoogleUserService(queryset)
-            data = serializer.data
+            if queryset is not None:
+                serializer = GoogleUserSerializer(queryset)
+                data = serializer.data
 
         except Exception as e:
             data = None

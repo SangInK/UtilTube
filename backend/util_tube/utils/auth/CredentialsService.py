@@ -22,7 +22,7 @@ class CredentialsService:
             self.credentials.refresh(google_requests.Request())
             self._update_google_user()
 
-    def _update_google_user():
+    def _update_google_user(self):
         if (
             self.google_user.is_valid()
             and self.google_user.data["access_token"] != self.credentials.token

@@ -30,17 +30,17 @@ class user_check(APIView):
         }
 
         # COOKIE에 user_token이 있을 경우 해당 토큰에 해당하는 유저 조회 후 처리
-        if "user_tokne" in request.COOKIES:
+        if "user_token" in request.COOKIES:
             user = UserService(user_token=request.COOKIES["user_token"])
 
             if user.is_valid():
-                if check_expires():
+                if user.check_expires():
                     # user의 login_state == 로그인 상태 여부 가 false == 로그아웃일 경우
                     if not user.data["user_state"]:
-                        response_data["loginState"] = LOGIN_STATE.logout
+                        response_data["loginState"] = LOGIN_STATE.logout.value
 
                     else:
-                        credentials = None
+                        google_user = GoogleUserService(id=user.data["google_user"])
 
                         if "credentials" in request.session:
                             credentials = CredentialsService(
@@ -51,7 +51,6 @@ class user_check(APIView):
                                 credentials.credentials_to_dict()
                             )
                         else:
-                            google_user = GoogleUserService(id=user.data["google_user"])
                             flow = FlowService()
 
                             credentials = CredentialsService(
@@ -71,7 +70,7 @@ class user_check(APIView):
                                 credentials.credentials_to_dict()
                             )
 
-                        response_data["loginState"] = LoginState.login.value
+                        response_data["loginState"] = LOGIN_STATE.login.value
                         response_data["user"] = google_user.get_google_user()
 
                 else:
@@ -80,8 +79,6 @@ class user_check(APIView):
 
             else:
                 response = _delete_cookie(response)
-
-            pass
 
         response.data = response_data
         response.status_code = status.HTTP_200_OK
@@ -160,10 +157,97 @@ class google_redirect(APIView):
     def _validate_date(self, request):
         data = request.GET
 
-    def get(self, request):
-        code, state = _validate_date(request)
+        code = data.get("code")
+        error = data.get("error")
+        state = data.get("state")
 
-        return Response(status=status.HTTP_200_OK)
+        if error is not None:
+            raise Exception(error)
+
+        if code is None or state is None:
+            raise Exception("Code and state are required.")
+
+        session_state = request.session["google_oauth2_state"]
+
+        if session_state is None:
+            raise Exception("CSRF check failed.")
+
+        del request.session["google_oauth2_state"]
+
+        if state != session_state:
+            raise Exception("CSRF check failed.")
+
+        return code, state
+
+    def get(self, request):
+        try:
+            js_str = f"""
+            <script>
+                location.href = '{settings.CLIENT_ORIGIN}?isOk=true'
+            </script>
+            """
+
+            response = HttpResponse(js_str)
+
+            code, state = self._validate_date(request)
+
+            flow = FlowService()
+            flow.set_flow(
+                {"client_config": flow.config, "scopes": flow.SCOPES, "state": state}
+            )
+
+            fetch_token = flow.set_token(code=code)
+            flow_credentials = flow.get_credentials()
+
+            credentials = CredentialsService(flow_credentials)
+            credentials.set_google_user(credentials.credentials.token)
+
+            youtube = credentials.get_youtube()
+
+            channels = (
+                youtube.channels()
+                .list(part="snippet,contentDetails,statistics", mine=True)
+                .execute()
+            )
+
+            google_user = GoogleUserService()
+            google_user.create_user(
+                user_id=channels["items"][0]["id"],
+                user_name=channels["items"][0]["snippet"]["title"],
+                thumb_url=channels["items"][0]["snippet"]["thumbnails"]["default"][
+                    "url"
+                ],
+                access_token=credentials.credentials.token,
+                refresh_token=credentials.credentials.refresh_token,
+            )
+
+            user = UserService()
+            user.create_user(google_user_id=google_user.data["id"])
+
+            response.status_code = status.HTTP_200_OK
+
+            request.session["credentials"] = credentials.credentials_to_dict()
+
+            response.set_cookie(
+                "user_token",
+                user.data["user_token"],
+                max_age=259200,
+                samesite="none",
+                secure=True,
+            )
+
+        except Exception as e:
+            print(f"error: {e.args[0]}")
+
+            js_str = f"""
+            <script>
+                location.href = '{settings.CLIENT_ORIGIN}?isOk=false'
+            </script>
+            """
+
+            response = HttpResponse(js_str)
+
+        return response
 
 
 class user_logout(APIView):
@@ -172,6 +256,25 @@ class user_logout(APIView):
         user.update_user(user_state=False)
 
         return Response({"user": None}, status=status.HTTP_200_OK)
+
+
+class user_revoke(APIView):
+    def post(self, request):
+        credentials = CredentialsService(request.session["credentials"])
+        revoke = credentials.rovoke_credentials()
+
+        if getattr(revoke, "status_code") == status.HTTP_200_OK:
+            del request.session["credentials"]
+            credentials.google_user.delete_user()
+
+            response = Response()
+            response = self._delete_cookie()
+
+            response.status_code = status.HTTP_200_OK
+
+            return response
+        else:
+            return Response(revoke.text, status=status.HTTP_400_BAD_REQUEST)
 
 
 def _delete_cookie(response):
