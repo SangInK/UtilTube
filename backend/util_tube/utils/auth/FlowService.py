@@ -22,13 +22,13 @@ class FlowService:
         self._set__client_data()
         self._set_config()
 
-    def _set__client_data():
+    def _set__client_data(self):
         file_path = os.path.join(os.path.dirname(__file__), "client_secret.json")
 
         with open(file_path, "r") as file:
             data = json.load(file)
 
-        data = data.get(GOOGLE_CLIENT_TYPE, {})
+        data = data.get(self.GOOGLE_CLIENT_TYPE, {})
 
         if not data.get("client_id"):
             raise ImproperlyConfigured("GOOGLE_OAUTH2_CLIENT_ID missing in settings.")
@@ -41,7 +41,7 @@ class FlowService:
         if not data.get("project_id"):
             raise ImproperlyConfigured("GOOGLE_OAUTH2_PROJECT_ID missing in settings.")
 
-        self.json_data
+        self.json_data = data
 
     def _set_config(self):
         self.config = {

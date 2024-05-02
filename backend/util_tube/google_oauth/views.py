@@ -156,6 +156,16 @@ class google_oauth(APIView):
             return response
 
 
+class google_redirect(APIView):
+    def _validate_date(self, request):
+        data = request.GET
+
+    def get(self, request):
+        code, state = _validate_date(request)
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class user_logout(APIView):
     def post(self, request):
         user = UserService(user_token=request.COOKIES["user_token"])
