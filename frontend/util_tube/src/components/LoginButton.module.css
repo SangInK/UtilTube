@@ -1,0 +1,58 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  .wrapper {
+    height: 100vh;
+    width: 100vw;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .btnWrapper {
+    padding: 5px;
+  
+    flex: 0 0 400px;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background-color: white;
+  
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+  
+    gap: 5px;
+  }
+  
+  .btnWrapper img {
+    display: flex;
+  
+    width: 60px;
+    height: 60px;
+  }
+  
+  .btnWrapper button {
+    height: 60px;
+  
+    flex: 1 0 auto;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background-color: #f2f2f2;
+    border: none;
+    border-radius: 5px;
+  
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  
+  .btnWrapper button:hover {
+    cursor: pointer;
+  }
+  

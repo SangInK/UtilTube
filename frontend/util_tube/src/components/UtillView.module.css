@@ -1,0 +1,10 @@
+.disabled {
+    position: absolute;
+
+    width: 100vw;
+    height: 100vh;
+
+    z-index: 500;
+
+    background-color: #0000007a;
+}

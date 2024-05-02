@@ -1,0 +1,12 @@
+.navbar {
+    position: fixed;
+
+    width: 100vw;
+    height: 55px;
+
+    padding: 0 20px;
+}
+
+.main {
+    padding: 55px 0;
+}
