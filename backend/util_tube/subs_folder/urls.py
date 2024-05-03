@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.view.as_view()),
+    path("folder/<int:pk>", views.folder.as_view()),
+    path("folders/", views.folders.as_view()),
 ]
