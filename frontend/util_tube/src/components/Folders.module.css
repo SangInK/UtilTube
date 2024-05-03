@@ -6,6 +6,9 @@
     overflow-x: auto;
 }
 
+
+/*#region folder */
+
 .folders .folder {
     flex-basis: 10%;
     flex-grow: 0;
@@ -23,9 +26,6 @@
 
     position: relative;
 
-    font-size: 1.5rem;
-    font-weight: 600;
-
     cursor: pointer;
 
     user-select: none;
@@ -38,16 +38,11 @@
     flex-basis: 5rem;
 }
 
-.folders img {
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-drag: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
 .folders .folder .folderName {
     padding: 0.5rem;
+
+    font-size: 1.2rem;
+    font-weight: 600;
 
     text-overflow: ellipsis;
     white-space: nowrap; /* 텍스트가 한 줄로 나오도록 */
@@ -64,3 +59,77 @@
 
     margin: 0;
 }
+
+.folders .folder img {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.folders .folder button {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 35px;
+    width: 35px;
+
+    border: none;
+    border-radius: 999px;
+    
+    background-color: #ffffff00;
+
+    filter: opacity(0.5);
+}
+
+.folders .folder button:hover {
+    background-color: #bf00ff12;
+
+    cursor: pointer;
+
+    filter: none;
+}
+
+.folders .folder button img {
+    height: 20px;
+    width: 20px;
+}
+/*#endregion */
+
+/*#region folder form*/
+.folders .folderForm {
+    flex-basis: 250px;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 0.5rem;
+
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+}
+
+.folders .folderForm input {
+    width: 100%;
+
+    margin-bottom: 0.5rem;
+}
+
+.folders .folderForm button {
+    margin: 0 0.2rem;
+}
+
+/*#endregion */
+
