@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
 } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { useUtil } from "./UtilContext";
 
@@ -30,7 +31,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [loginState, setLoginState] = useState(LOGIN_STATE.nosign);
 
-  const { executeFetch } = useUtil();
+  const { setIsRunning, executeFetch } = useUtil();
 
   /**
    * userLogin(), userLogout(), userRevoke(), loginCheck()에서
@@ -53,6 +54,11 @@ export const UserProvider = ({ children }) => {
     [executeFetch]
   );
 
+  /**
+   * 화면 최초 로딩 시 Google 인증여부 및 로그인 여부 확인.
+   * 로그인 상태이면 /main 으로 이동.
+   * 로그인 상태가 아니면 /login 으로 이동.
+   */
   const loginCheck = useCallback(async () => {
     const resultType = "loginState";
 
@@ -72,6 +78,11 @@ export const UserProvider = ({ children }) => {
     }
   }, [callExecuteFetch, navigate]);
 
+  /**
+   * 로그인 처리
+   * Google 인증이 완료된 상태면 로그인 처리만,
+   * Google 인증이 완료되지 않은 상태면 Google 인증을 위한 인증화면 팝업
+   */
   const userLogin = useCallback(async () => {
     const resultType = "user";
 
@@ -106,6 +117,7 @@ export const UserProvider = ({ children }) => {
             if (isOk === "true") {
               await loginCheck();
             } else {
+              setIsRunning(false);
               return;
             }
           }
@@ -116,9 +128,14 @@ export const UserProvider = ({ children }) => {
 
       return navigate("/main");
     }
-  }, [callExecuteFetch, navigate]);
+  }, [loginCheck, setIsRunning, callExecuteFetch, navigate]);
 
+  /**
+   * 로그아웃 처리
+   */
   const userLogout = useCallback(async () => {
+    setIsRunning(true);
+
     await callExecuteFetch({
       method: "POST",
       path: "auth/logout/",
@@ -128,9 +145,14 @@ export const UserProvider = ({ children }) => {
     setLoginState(LOGIN_STATE.logout);
 
     return navigate("/login");
-  }, [callExecuteFetch, navigate]);
+  }, [setIsRunning, callExecuteFetch, navigate]);
 
+  /**
+   * Google 인증 취소
+   */
   const userRevoke = useCallback(async () => {
+    setIsRunning(true);
+
     await callExecuteFetch({
       method: "POST",
       path: "auth/revoke/",
@@ -140,7 +162,7 @@ export const UserProvider = ({ children }) => {
     setLoginState(LOGIN_STATE.nosign);
 
     return navigate("/login");
-  }, [callExecuteFetch, navigate]);
+  }, [setIsRunning, callExecuteFetch, navigate]);
 
   useEffect(() => {
     const executeCheck = async () => {
@@ -162,7 +184,7 @@ export const UserProvider = ({ children }) => {
       userRevoke,
       loginCheck,
     }),
-    [user, loginState]
+    [user, loginState, userLogin, userLogout, userRevoke, loginCheck]
   );
 
   return (

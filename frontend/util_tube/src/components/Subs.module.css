@@ -1,0 +1,12 @@
+.subs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    flex-wrap: wrap;
+
+    align-items: start;
+    justify-content: start;
+
+    overflow-y: auto;
+}

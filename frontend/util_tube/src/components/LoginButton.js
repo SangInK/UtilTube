@@ -16,7 +16,7 @@ const LoginButton = () => {
   }, [setIsRunning]);
 
   const handleClick = async () => {
-    //setIsRunning(true);
+    setIsRunning(true);
 
     await userLogin();
   };

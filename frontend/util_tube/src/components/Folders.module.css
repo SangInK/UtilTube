@@ -1,0 +1,66 @@
+.folders {
+    display: flex;
+
+    gap: 0.5rem;
+
+    overflow-x: auto;
+}
+
+.folders .folder {
+    flex-basis: 10%;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 100%;
+    max-width: 10%;
+
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    user-select: none;
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, Opera */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.folders .folder.small {
+    flex-basis: 5rem;
+}
+
+.folders img {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.folders .folder .folderName {
+    padding: 0.5rem;
+
+    text-overflow: ellipsis;
+    white-space: nowrap; /* 텍스트가 한 줄로 나오도록 */
+    overflow: hidden; /* 넘치는 텍스트 숨김 */
+}
+
+.folders .folder .folderInfo {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+
+    font-size: 0.8rem;
+    color: gray;
+
+    margin: 0;
+}

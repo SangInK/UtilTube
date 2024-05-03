@@ -1,0 +1,41 @@
+.main {
+    display: flex;
+    flex-direction: column;
+
+    height: 100vh;
+    width: 100vw;
+}
+
+.folders {
+    flex-basis: 120px;
+    flex-shrink: 0;
+    flex-grow: 0;
+
+    margin-top: 5px;
+    padding: 0 0.5rem;
+}
+
+.subs {
+    width: 100vw;
+
+    flex-basis: 100%;
+    flex-shrink: 1;
+    flex-grow: 0;
+
+    padding: 0 0.5rem;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0px;
+
+    width: 100vw;
+    height:55px;
+
+    border-top: 2px solid gray;
+
+    text-align: center;
+
+    color: gray;
+    font-weight: 700;
+}
