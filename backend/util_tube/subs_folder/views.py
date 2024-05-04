@@ -47,9 +47,82 @@ class folder(APIView):
             folder = Folder.objects.get(id=pk)
             folder.delete()
 
+            return Response({"isOk": True}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"isOk": False}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class subscription(APIView):
+    def delete(self, request):
+        try:
+            filter_channel = Q()
+
+            for item in request.data:
+                filter_channel |= Q(subs_id=item["subs_id"])
+
+            subs = Subscription.objects.filter(filter_channel)
+            subs.delete()
+
             subs = _get_subscriptions(request, 0)
 
-            return Response({"isOk": True, "subs": subs}, status=status.HTTP_200_OK)
+            return Response({"isOk": True, "data": subs}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class subscriptions(APIView):
+    def get(self, request, pk):
+        if "credentials" in request.session:
+            subs = _get_subscriptions(request, pk)
+
+            return Response(subs, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, pk):
+        # 이미 입력된 구독채널이 있으면 삭제
+        data = [data for data in request.data if "folder" in data]
+
+        if len(data) > 0:
+            filter = Q()
+
+            for item in data:
+                filter |= Q(subs_id=item["subs_id"])
+
+            subs = Subscription.objects.filter(filter)
+            subs.delete()
+
+        # 이미 입렬된 구독채널 삭제 후 request.data를 사용하여 다시 입력
+        data = request.data
+        folder = Folder.objects.get(id=pk)
+        folder_serializer = FolderSerializer(folder)
+
+        for item in data:
+            item["folder"] = folder_serializer.data
+
+        serializer = SubscriptionSerializer(data=data, many=True)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+        subs = _get_subscriptions(request, 0)
+
+        return Response({"isOk": True, "data": subs}, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        try:
+            filter = Q(folder=pk)
+            filter_channel_id = Q()
+
+            for subs_channel_id in request.data["subs"]:
+                filter_channel_id |= Q(subs_channel_id=subs_channel_id)
+
+            filter &= filter_channel_id
+
+            subs = Subscription.objects.filter(filter)
+            subs.delete()
+
+            return Response({"isOk": True}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,10 +160,10 @@ def _get_subscriptions(request, pk):
             item["snippet"]
             for item in subscriptions["items"]
             if item["snippet"]["resourceId"]["channelId"]
-            not in [item["subs_channel_id"] for item in my_subs]
+            not in [item["subs_id"] for item in my_subs]
         ]:
             subs_temp = {
-                "subs_channel_id": item["resourceId"]["channelId"],
+                "subs_id": item["resourceId"]["channelId"],
                 "title": item["title"],
                 "description": item["description"],
                 "thumbnails": item["thumbnails"]["default"]["url"],
