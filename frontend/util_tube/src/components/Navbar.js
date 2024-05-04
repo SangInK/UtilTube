@@ -7,7 +7,7 @@ import { useUser } from "../providers/UserContext";
 import styles from "./Navbar.module.css";
 
 const Navbar = ({ className }) => {
-  const { setIsRunning, createStyleClass } = useUtil();
+  const { createStyleClass } = useUtil();
   const { user, userLogout, userRevoke } = useUser();
 
   const handleClickLogout = async () => {
@@ -17,10 +17,6 @@ const Navbar = ({ className }) => {
   const handleClickRevoke = async () => {
     await userRevoke();
   };
-
-  useEffect(() => {
-    setIsRunning(false);
-  }, []);
 
   return (
     <>

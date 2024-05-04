@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useUtil } from "../providers/UtilContext";
 
 import styles from "./Folders.module.css";
@@ -6,13 +6,19 @@ import styles from "./Folders.module.css";
 import addIcon from "../assets/Folder/icons8-add-folder-30.png";
 import allIcon from "../assets/Folder/icons8-select-all-30.png";
 import deleteIcon from "../assets/Folder/icons8-delete-folder-30.png";
+import moveIcon from "../assets/Folder/icons8-move-stock-30.png";
+import cancelIcon from "../assets/Folder/icons8-cancel-30.png";
 
-const Folder = ({ className, folder, subs, onClick, onClickDelete }) => {
+const Folder = ({ className, folder, subs, onClick, onClickDelete, mode }) => {
   const folderType = folder.folder_name
     ? "folder"
-    : folder.icon == addIcon
+    : folder.icon === addIcon
     ? "plus"
+    : folder.icon === moveIcon || folder.icon === cancelIcon
+    ? "move"
     : "all";
+
+  const [isMouseOver, setIsMouseOver] = useState(false);
 
   /**
    *
@@ -21,12 +27,24 @@ const Folder = ({ className, folder, subs, onClick, onClickDelete }) => {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    if (folderType === "folder") {
-      onClick(subs);
-    } else if (folderType === "plus") {
-      onClick((current) => (current === "read" ? "craete" : "read"));
-    } else if (folderType === "all") {
-      await onClick();
+    if (isMouseOver) return;
+
+    if (mode === "read") {
+      if (folderType === "folder") {
+        onClick(folder.id, subs);
+      } else if (folderType === "plus") {
+        onClick((current) => (current === "read" ? "create" : "read"));
+      } else if (folderType === "move") {
+        onClick((current) => (current === "read" ? "move" : "read"));
+      } else if (folderType === "all") {
+        await onClick();
+      }
+    } else {
+      if (folderType === "folder") {
+        console.log("test");
+      } else if (folderType === "move") {
+        onClick((current) => (current === "read" ? "move" : "read"));
+      }
     }
   };
 
@@ -40,6 +58,10 @@ const Folder = ({ className, folder, subs, onClick, onClickDelete }) => {
     await onClickDelete(folder.id);
   };
 
+  const handleMouse = (e) => {
+    setIsMouseOver(e.type === "mouseover" ? true : false);
+  };
+
   return (
     <div
       className={className}
@@ -47,17 +69,24 @@ const Folder = ({ className, folder, subs, onClick, onClickDelete }) => {
       onClick={handleClick}
     >
       {folderType === "folder" ? (
-        <button title="폴더 삭제" onClick={handleClickDelete}>
+        <button
+          title="폴더 삭제"
+          onClick={handleClickDelete}
+          onMouseOver={handleMouse}
+          onMouseLeave={handleMouse}
+        >
           <img src={deleteIcon} alt="폴더 삭제" />
         </button>
       ) : null}
       {folderType === "folder" ? (
         <p className={styles.folderName}>{folder.folder_name}</p>
       ) : (
-        <img src={folder.icon} />
+        <img src={folder.icon} alt={folder.alt} />
       )}
-      {folderType === "folder" ? (
-        <p className={styles.folderInfo}>채널수: {subs.length}</p>
+      {folderType === "folder" || folderType === "all" ? (
+        <p className={styles.folderInfo}>
+          {folderType === "all" && "총"}채널수: {subs.length}
+        </p>
       ) : null}
     </div>
   );
@@ -119,34 +148,66 @@ const FolderForm = ({ className, onClickCancel, onSubmit }) => {
   );
 };
 
-const Folders = ({
-  className,
-  datas,
-  onClickSelect,
-  onClickDelete,
-  onSubmit,
-}) => {
-  const { createStyleClass } = useUtil();
-  const [mode, setMode] = useState("read");
+const Folders = memo(({ className, datas, setDatas, mode, setMode }) => {
+  const { createStyleClass, executeFetch, setIsRunning } = useUtil();
 
   /**
    *
    * @param {int} folderId
    */
   const handleClickDelete = async (folderId) => {
-    console.log("handleClickDelete");
+    setIsRunning(true);
 
-    await onClickDelete(folderId);
+    await executeFetch({
+      method: "DELETE",
+      path: `subs/folder/${folderId}`,
+    });
+
+    setDatas((current) => {
+      const deleteIndex = current.folders.findIndex(
+        (item) => item.id === folderId
+      );
+
+      const checkCurrentFolder =
+        folderId !== 0 && current.currentFolder !== folderId;
+
+      return {
+        ...current,
+        folders: [
+          ...current.folders.slice(0, deleteIndex),
+          ...current.folders.slice(deleteIndex + 1),
+        ],
+        currentFolder: checkCurrentFolder ? current.currentFolder : 0,
+        currentSubs: checkCurrentFolder ? current.currentSubs : current.subs,
+      };
+    });
+    setIsRunning(false);
   };
 
   /**
    *
    * @param {Array} subs
    */
-  const handleClickSelect = async (subs = null) => {
-    console.log("handleClickSelect");
+  const handleClickSelect = async (folderId = 0, subs = null) => {
+    setIsRunning(true);
 
-    await onClickSelect(subs);
+    if (subs == null) {
+      const subs = await executeFetch({
+        method: "GET",
+        path: "subs/0",
+      });
+
+      setDatas({
+        ...datas,
+        subs: [...subs],
+        currentFolder: folderId,
+        currentSubs: [...subs],
+      });
+    } else {
+      setDatas({ ...datas, currentFolder: folderId, currentSubs: [...subs] });
+    }
+
+    setIsRunning(false);
   };
 
   /**
@@ -154,17 +215,44 @@ const Folders = ({
    * @param {object} data
    */
   const handleSubmit = async (data) => {
-    await onSubmit(data);
+    setIsRunning(true);
+
+    const result = await executeFetch({
+      method: "POST",
+      path: "subs/folders/",
+      data: data,
+    });
+
+    setDatas((current) => ({
+      ...current,
+      folders: [...current.folders, result],
+    }));
+
+    setIsRunning(false);
   };
 
   return (
     <div className={createStyleClass(styles, ["folders"], className)}>
-      {mode === "read" ? (
-        <Folder
-          className={`${styles.folder} ${styles.small}`}
-          folder={{ icon: addIcon, alt: "폴더 추가" }}
-          onClick={setMode}
-        />
+      {mode === "read" || mode === "move" ? (
+        <div className={styles.buttonDiv}>
+          <Folder
+            className={`${styles.folderButton} ${
+              mode === "move" ? styles.disabled : ""
+            }`}
+            folder={{ icon: addIcon, alt: "폴더 추가" }}
+            onClick={setMode}
+            mode={mode}
+          />
+          <Folder
+            className={styles.folderButton}
+            folder={{
+              icon: mode === "read" ? moveIcon : cancelIcon,
+              alt: mode === "read" ? "채널 이동 모드" : "취소",
+            }}
+            onClick={setMode}
+            mode={mode}
+          />
+        </div>
       ) : (
         <FolderForm
           className={styles.folderForm}
@@ -173,13 +261,17 @@ const Folders = ({
         />
       )}
       <Folder
-        className={`${styles.folder} ${styles.small}`}
+        className={`${styles.folder} ${styles.small} ${
+          mode === "move" ? styles.disabled : ""
+        }`}
         folder={{ icon: allIcon, alt: "전체 폴더" }}
         onClick={handleClickSelect}
+        subs={datas.subs}
+        mode={mode}
       />
 
       {datas.folders.map((folder) => {
-        const subs = datas.subs.filter((sub) => sub.folder_id === folder.id);
+        const subs = datas.subs.filter((sub) => sub?.folder?.id === folder.id);
 
         return (
           <Folder
@@ -189,11 +281,12 @@ const Folders = ({
             subs={subs}
             onClick={handleClickSelect}
             onClickDelete={handleClickDelete}
+            mode={mode}
           />
         );
       })}
     </div>
   );
-};
+});
 
 export default Folders;

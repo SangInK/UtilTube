@@ -7,6 +7,41 @@
 }
 
 
+/*#region folders 내부 button 용 div */
+.folders .buttonDiv {
+    flex-basis: 5rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    display: flex; 
+    flex-direction: column;
+
+    gap: 0.5rem;
+}
+
+.folders .buttonDiv .folderButton {
+    flex-basis: 50%;
+    flex-grow: 0;
+    flex-shrink: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    user-select: none;
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, Opera */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+/*#endregion */
+
+
 /*#region folder */
 
 .folders .folder {
@@ -35,7 +70,9 @@
 }
 
 .folders .folder.small {
-    flex-basis: 5rem;
+    flex-basis: 5%;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .folders .folder .folderName {
@@ -133,3 +170,12 @@
 
 /*#endregion */
 
+
+
+.folders .disabled {   
+    background: white;
+    filter: contrast(0.5);
+    border-color: gray;
+
+    cursor: no-drop !important;
+}

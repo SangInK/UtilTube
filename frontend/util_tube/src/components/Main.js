@@ -13,10 +13,15 @@ const Main = ({ className }) => {
   const [datas, setDatas] = useState({
     folders: [],
     subs: [],
+    currentFolder: 0,
     currentSubs: [],
   });
 
+  const [mode, setMode] = useState("read");
+
   useEffect(() => {
+    setIsRunning(true);
+
     const getData = async () => {
       try {
         const folders = await executeFetch({
@@ -24,76 +29,20 @@ const Main = ({ className }) => {
           path: "subs/folders/",
         });
 
-        // const subs = await executeFetch({
-        //   method: "GET",
-        //   path: "subs/0",
-        // });
+        const subs = await executeFetch({
+          method: "GET",
+          path: "subs/0",
+        });
 
-        // setDatas({ folders, subs });
-        setDatas({ folders, subs: [], currentSubs: [] });
+        setDatas({ folders, subs, currentSubs: subs });
       } catch (e) {
       } finally {
+        setIsRunning(false);
       }
     };
 
-    // user가 빈 값이 아닐 경우 폴더와 구독 채널 조회
     getData();
   }, [executeFetch]);
-
-  //#region folders
-  const handleClick = async (subs = null) => {
-    // if (subs == null) {
-    //   subs = await executeFetch({ method: "GET", path: "subs/0" });
-    // } else {
-    //   console.log(subs);
-    //   setDatas({ ...datas, currentSubs: [...subs] });
-    // }
-  };
-
-  const handleClickDelete = async (folderId) => {
-    setIsRunning(true);
-
-    const result = await executeFetch({
-      method: "DELETE",
-      path: `subs/folder/${folderId}`,
-    });
-
-    setDatas((current) => {
-      const deleteIndex = current.folders.findIndex(
-        (item) => item.id == folderId
-      );
-
-      return {
-        ...current,
-        folders: [
-          ...current.folders.slice(0, deleteIndex),
-          ...current.folders.slice(deleteIndex + 1),
-        ],
-        //subs: result.subs,
-      };
-    });
-
-    setIsRunning(false);
-  };
-
-  const handleSubmit = async (data) => {
-    setIsRunning(true);
-
-    const result = await executeFetch({
-      method: "POST",
-      path: "subs/folders/",
-      data: data,
-    });
-
-    setDatas((current) => ({
-      ...current,
-      folders: [...current.folders, result],
-    }));
-
-    setIsRunning(false);
-  };
-
-  //#endregion
 
   return (
     <>
@@ -101,11 +50,16 @@ const Main = ({ className }) => {
         <Folders
           className={styles.folders}
           datas={datas}
-          onClickSelect={handleClick}
-          onClickDelete={handleClickDelete}
-          onSubmit={handleSubmit}
+          setDatas={setDatas}
+          mode={mode}
+          setMode={setMode}
         />
-        <Subs className={styles.subs} subs={datas.currentSubs} />
+
+        {mode === "move" ? (
+          <h3>move</h3>
+        ) : (
+          <Subs className={styles.subs} subs={datas.currentSubs} />
+        )}
       </div>
       <Footer className={styles.footer} />
     </>
