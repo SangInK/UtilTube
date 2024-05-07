@@ -67,6 +67,8 @@ class GoogleUserService:
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
+        self.set_google_user(user_id=serializer.data["user_id"])
+
     def create_user(self, **kwargs):
         self.set_google_user(user_id=kwargs["user_id"])
 

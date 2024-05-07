@@ -9,6 +9,8 @@ class UserService:
     def __init__(self, **kwargs):
         if "user_token" in kwargs:
             self.set_user(user_token=kwargs["user_token"])
+        elif "google_user_id" in kwargs:
+            self.set_user(google_user_id=kwargs["google_user_id"])
 
     def set_user(self, **kwargs):
         data = None
@@ -17,6 +19,8 @@ class UserService:
         try:
             if "user_token" in kwargs:
                 queryset = User.objects.get(user_token=kwargs["user_token"])
+            elif "google_user_id" in kwargs:
+                queryset = User.objects.get(google_user_id=kwargs["google_user_id"])
 
             if queryset is not None:
                 serializer = UserSerializer(queryset)
@@ -57,8 +61,9 @@ class UserService:
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
+        self.set_user(google_user_id=serializer.data["google_user"])
+
     def create_user(self, google_user_id):
-        self.set_user(google_user_id=google_user_id)
 
         if self.is_valid():
             self.update_user(

@@ -196,7 +196,7 @@ class google_redirect(APIView):
                 {"client_config": flow.config, "scopes": flow.SCOPES, "state": state}
             )
 
-            fetch_token = flow.set_token(code=code)
+            flow.set_token(code=code)
             flow_credentials = flow.get_credentials()
 
             credentials = CredentialsService(flow_credentials)
@@ -221,7 +221,7 @@ class google_redirect(APIView):
                 refresh_token=credentials.credentials.refresh_token,
             )
 
-            user = UserService()
+            user = UserService(google_user_id=google_user.data["id"])
             user.create_user(google_user_id=google_user.data["id"])
 
             response.status_code = status.HTTP_200_OK
