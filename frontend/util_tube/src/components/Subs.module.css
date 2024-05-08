@@ -1,12 +1,108 @@
 .subs {
+    overflow-y: auto;
+
+    position:relative;
+}
+
+.subs .buttonDiv {
+    position:absolute;
+
+    bottom: 0;
+
+    height: 3%;
+    width: calc(100% - 0.5rem);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subs .buttonDiv .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 4%;
+    height: 100%;
+
+    border: 2px solid #dddddd;
+    border-radius: 15px;
+
+    background-color: #ffffff;
+    filter: opacity(0.5);
+}
+
+.subs .buttonDiv .button:hover {
+    filter: opacity(1);
+
+    cursor: pointer;
+}
+
+.subs .subDiv {
+    display: inline-block;
+
+    height: 20%;
+    width: 20%;
+    
+    padding: 0.3rem;
+}
+
+.subs .subDiv .sub {
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+
+    display: flex;
+
+    cursor: pointer;
+}
+
+.subs .subDiv .sub .imgDiv {
+    flex: 25% 0 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.subs .subDiv .sub img {
+    border-radius: 999px;
+}
+
+.subs .subDiv .sub .contentDiv {
+    flex-basis: 75%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    
+    max-width: 75%;
+    height: 100%;
+
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
 
-    flex-wrap: wrap;
+    padding: 0.5rem;
+}
 
-    align-items: start;
-    justify-content: start;
+.subs .subDiv .sub .contentDiv .title {
+    /* flex: 20% 0 0;
+    width: 100%; */
 
-    overflow-y: auto;
+    font-size: 1.5rem;
+    font-weight: 700;
+
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.subs .subDiv .sub .contentDiv .content {
+    flex: 80% 0 1;
+
+    display: flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

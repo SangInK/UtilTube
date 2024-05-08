@@ -106,7 +106,7 @@ const Main = ({ className }) => {
 
         const subs = await selectSubs();
 
-        setDatas({ folders, subs, currentSubs: subs, currentFolder: 0 });
+        setDatas({ folders, subs, currentSubs: subs.items, currentFolder: 0 });
       } catch (e) {
       } finally {
         setIsRunning(false);
@@ -122,65 +122,6 @@ const Main = ({ className }) => {
         <Folders className={styles.folders} />
 
         {mode === "move" ? <h3>move</h3> : <Subs className={styles.subs} />}
-      </div>
-      <Footer className={styles.footer} />
-    </>
-  );
-};
-
-const Main2 = ({ className }) => {
-  const { executeFetch, createStyleClass, setIsRunning } = useUtil();
-
-  const [datas, setDatas] = useState({
-    folders: [],
-    subs: [],
-    currentFolder: 0,
-    currentSubs: [],
-  });
-
-  const [mode, setMode] = useState("read");
-
-  useEffect(() => {
-    setIsRunning(true);
-
-    const getData = async () => {
-      try {
-        const folders = await executeFetch({
-          method: "GET",
-          path: "subs/folders/",
-        });
-
-        const subs = await executeFetch({
-          method: "GET",
-          path: "subs/0",
-        });
-
-        setDatas({ folders, subs, currentSubs: subs });
-      } catch (e) {
-      } finally {
-        setIsRunning(false);
-      }
-    };
-
-    getData();
-  }, [executeFetch]);
-
-  return (
-    <>
-      <div className={createStyleClass(styles, ["main"], className)}>
-        <Folders
-          className={styles.folders}
-          datas={datas}
-          setDatas={setDatas}
-          mode={mode}
-          setMode={setMode}
-        />
-
-        {mode === "move" ? (
-          <h3>move</h3>
-        ) : (
-          <Subs className={styles.subs} subs={datas.currentSubs} />
-        )}
       </div>
       <Footer className={styles.footer} />
     </>

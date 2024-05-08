@@ -136,6 +136,10 @@
     height: 20px;
     width: 20px;
 }
+
+.folders .folder.selected {
+    border-color: gray;
+}
 /*#endregion */
 
 /*#region folder form*/
