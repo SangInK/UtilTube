@@ -135,7 +135,7 @@ def _update_credentials(request):
 
 
 def _get_subscriptions(request, pk):
-    max_result = 20
+    max_result = 25
 
     credentials = _update_credentials(request)
 
@@ -147,10 +147,10 @@ def _get_subscriptions(request, pk):
         .execute()
     )
 
-    subs = None
+    subs = {"page_info": subscriptions}
 
     if pk == 0:
-        subs = []
+        subs["items"] = []
         my_subs = Subscription.objects.all()
 
         serializer = SubscriptionSerializer(my_subs, many=True)
@@ -169,14 +169,14 @@ def _get_subscriptions(request, pk):
                 "thumbnails": item["thumbnails"]["default"]["url"],
             }
 
-            subs.append(subs_temp)
+            subs["items"].append(subs_temp)
 
-        subs = my_subs + subs
+        subs["items"] = my_subs + subs["items"]
 
     else:
-        subs = Subscription.objects.filter(folder=pk)
+        subs["items"] = Subscription.objects.filter(folder=pk)
 
-        serializer = SubscriptionSerializer(subs, many=True)
-        subs = serializer.data
+        serializer = SubscriptionSerializer(subs["items"], many=True)
+        subs["items"] = serializer.data
 
     return subs
