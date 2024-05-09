@@ -76,19 +76,25 @@ class subscription(APIView):
 class subscriptions(APIView):
     def get(self, request, pk, nextToken):
         if "credentials" in request.session:
-            subs = _get_subscriptions(request, pk)
+            subs = _get_subscriptions(
+                request, pk, "" if nextToken == "firstSearch" else nextToken
+            )
 
-            while (
-                nextToken != "firstSearch"
-                and nextToken != str(MAX_RESULT)
-                and "nextPageToken" in subs["page_info"]
-            ):
-                subs_temp = _get_subscriptions(
-                    request, pk, subs["page_info"]["nextPageToken"]
-                )
+            # subs = _get_subscriptions(request, pk)
 
-                subs["page_info"] = subs_temp["page_info"]
-                subs["items"] = subs["items"] + subs_temp["items"]
+            # while (
+            #     nextToken != "firstSearch"
+            #     and nextToken != str(MAX_RESULT)
+            #     and "nextPageToken" in subs["page_info"]
+            # ):
+            #     subs_temp = _get_subscriptions(
+            #         request, pk, subs["page_info"]["nextPageToken"]
+            #     )
+
+            #     subs["page_info"] = subs_temp["page_info"]
+            #     subs["items"] = subs["items"] + subs_temp["items"]
+
+            # TODO subs["pageInfo"]["totalResults"] 와 maxTotals의 값이 틀릴 경우
 
             return Response(subs, status=status.HTTP_200_OK)
         else:
@@ -149,7 +155,7 @@ def _update_credentials(request):
     return credentials
 
 
-def _get_subscriptions(request, pk, nextToken=""):
+def _get_subscriptions(request, pk, nextToken):
 
     credentials = _update_credentials(request)
 
@@ -161,7 +167,12 @@ def _get_subscriptions(request, pk, nextToken=""):
         .execute()
     )
 
-    subs = {"page_info": subscriptions}
+    subs = {
+        "pageInfo": {
+            **subscriptions["pageInfo"],
+            **{"nextPageToken": subscriptions["nextPageToken"]},
+        }
+    }
 
     if pk == 0:
         subs["items"] = []
