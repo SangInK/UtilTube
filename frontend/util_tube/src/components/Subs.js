@@ -29,7 +29,7 @@ const Sub = ({ sub }) => {
     <div className={styles.subDiv}>
       <div className={styles.sub} onClick={handleClickSub}>
         <div className={styles.imgDiv}>
-          <img src={sub.thumbnails} />
+          <img src={sub.thumbnails} alt={sub.title} />
         </div>
         <div className={styles.contentDiv}>
           <div className={styles.title} title={sub.title}>
@@ -45,21 +45,44 @@ const Sub = ({ sub }) => {
 };
 
 const Subs = memo(({ className }) => {
-  const { datas } = useMain();
-  const { createStyleClass, setIsRunning } = useUtil();
+  const { datas, setDatas, selectSubs } = useMain();
+  const { setIsRunning } = useUtil();
 
   useEffect(() => {
     setIsRunning(false);
-  }, []);
+  }, [setIsRunning]);
+
+  const handleClickButton = async (e) => {
+    setIsRunning(true);
+
+    const result = await selectSubs(0, datas.subs.pageInfo?.nextPageToken);
+
+    setDatas((current) => ({
+      ...current,
+      subs: {
+        pageInfo: { ...result.pageInfo },
+        items: [...current.subs.items, ...result.items],
+      },
+      currentSubs: [...current.currentSubs, ...result.items],
+    }));
+
+    setIsRunning(false);
+  };
 
   return (
-    <div className={createStyleClass(styles, ["subs"], className)}>
-      {datas.currentSubs.map((item, index) => {
-        return <Sub key={index} sub={item} />;
-      })}
-      <div className={styles.buttonDiv}>
-        <div className={styles.button}>더보기</div>
+    <div className={className}>
+      <div className={styles.subs}>
+        {datas.currentSubs.map((item, index) => {
+          return <Sub key={index} sub={item} />;
+        })}
       </div>
+      {datas.subs.pageInfo?.nextPageToken && (
+        <div className={styles.buttonDiv}>
+          <div className={styles.button} onClick={handleClickButton}>
+            더보기
+          </div>
+        </div>
+      )}
     </div>
   );
 });

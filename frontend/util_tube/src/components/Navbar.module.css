@@ -4,6 +4,10 @@
     align-items: center;
 
     border-bottom: 2px solid #dddddd;
+
+    background-color: white;
+
+    z-index: 10;
 }
 
 .navbar .thumb_button {

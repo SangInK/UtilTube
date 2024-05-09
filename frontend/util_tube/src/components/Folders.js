@@ -14,10 +14,9 @@ import cancelIcon from "../assets/Folder/icons8-cancel-30.png";
 const Folder = ({ className, folder, subs }) => {
   const [isMouseOver, setIsMouseOver] = useState(false);
 
-  const [styleArray, setStyleArray] = useState([]);
-
-  const { setDatas, mode, setMode, deleteFolder, selectSubs } = useMain();
-  const { createStyleClass, setIsRunning } = useUtil();
+  const { datas, setDatas, mode, setMode, deleteFolder, selectSubs } =
+    useMain();
+  const { setIsRunning } = useUtil();
 
   const folderType = folder.folder_name
     ? "folder"
@@ -43,6 +42,25 @@ const Folder = ({ className, folder, subs }) => {
       if (mode === "read") {
         const newSubs = await selectSubs();
 
+        // setDatas((current) => {
+        //   debugger;
+        //   // if (current.subs.items.length === newSubs.items.length) {
+        //   //   newSubs.items = current.subs.items;
+        //   // }
+
+        //   newSubs.items =
+        //     current.subs.items.length < newSubs.items.length
+        //       ? current.subs.items
+        //       : newSubs.items;
+
+        //   return {
+        //     ...current,
+        //     subs: { ...newSubs },
+        //     currentFolder: 0,
+        //     currentSubs: [...newSubs.items],
+        //   };
+        // });
+
         setDatas((current) => ({
           ...current,
           subs: { ...newSubs },
@@ -57,13 +75,26 @@ const Folder = ({ className, folder, subs }) => {
     } else if (folderType === "move") {
       if (mode === "read") {
         setMode((current) => (current === "read" ? "move" : "read"));
-        setDatas((current) => ({
-          ...current,
-          currentFolder:
+
+        setDatas((current) => {
+          const currentFolder =
             current.currentFolder === 0
-              ? current.folders[0].id
-              : current.currentFolder,
-        }));
+              ? current.folders[0]?.id ?? 0
+              : current.currentFolder;
+
+          const currentSubs =
+            current.currentFolder === 0
+              ? current.subs.items.filter(
+                  (item) => item.folder?.id === currentFolder
+                )
+              : current.currentSubs;
+
+          return {
+            ...current,
+            currentFolder: currentFolder,
+            currentSubs: [...currentSubs],
+          };
+        });
       } else if (mode === "move") {
         setMode((current) => (current === "read" ? "move" : "read"));
       }
@@ -75,6 +106,7 @@ const Folder = ({ className, folder, subs }) => {
   const handleClickDelete = async (e) => {
     setIsRunning(true);
 
+    debugger;
     const folderId = folder.id;
 
     await deleteFolder(folderId);
@@ -94,7 +126,9 @@ const Folder = ({ className, folder, subs }) => {
           ...current.folders.slice(deleteIndex + 1),
         ],
         currentFolder: checkCurrentFolder ? current.currentFolder : 0,
-        currentSubs: checkCurrentFolder ? current.currentSubs : current.subs,
+        currentSubs: checkCurrentFolder
+          ? current.currentSubs
+          : current.subs.items,
       };
     });
     setIsRunning(false);
@@ -106,7 +140,7 @@ const Folder = ({ className, folder, subs }) => {
 
   return (
     <div
-      className={createStyleClass(styles, styleArray, className)}
+      className={className}
       title={folderType !== "folder" ? folder.alt : folder.folder_name}
       onClick={handleClickFolder}
     >
@@ -148,9 +182,9 @@ const FolderForm = ({ className }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsRunning(true);
 
     if (isRunning || folderName === "") return;
+    setIsRunning(true);
 
     const data = {
       folder_name: folderName,
@@ -190,61 +224,59 @@ const FolderForm = ({ className }) => {
 };
 
 const Folders = memo(({ className }) => {
-  {
-    const { createStyleClass } = useUtil();
-    const { datas, mode } = useMain();
+  const { createStyleClass } = useUtil();
+  const { datas, mode } = useMain();
 
-    return (
-      <div className={createStyleClass(styles, ["folders"], className)}>
-        {mode === "read" || mode === "move" ? (
-          <div className={styles.buttonDiv}>
-            <Folder
-              className={`${styles.folderButton} ${
-                mode === "move" ? styles.disabled : ""
-              }`}
-              folder={{ icon: addIcon, alt: "폴더 추가" }}
-            />
-            <Folder
-              className={styles.folderButton}
-              folder={{
-                icon: mode === "read" ? moveIcon : cancelIcon,
-                alt: mode === "read" ? "채널 이동 모드" : "취소",
-              }}
-            />
-          </div>
-        ) : (
-          <FolderForm className={styles.folderForm} />
-        )}
+  return (
+    <div className={createStyleClass(styles, ["folders"], className)}>
+      {mode === "read" || mode === "move" ? (
+        <div className={styles.buttonDiv}>
+          <Folder
+            className={`${styles.folderButton} ${
+              mode === "move" ? styles.disabled : ""
+            }`}
+            folder={{ icon: addIcon, alt: "폴더 추가" }}
+          />
+          <Folder
+            className={`${styles.folderButton} ${
+              datas.folders.length <= 0 ? styles.disabled : ""
+            }`}
+            folder={{
+              icon: mode === "read" ? moveIcon : cancelIcon,
+              alt: mode === "read" ? "채널 이동 모드" : "취소",
+            }}
+          />
+        </div>
+      ) : (
+        <FolderForm className={styles.folderForm} />
+      )}
 
-        <Folder
-          className={`${styles.folder} ${styles.small} ${
-            mode === "move" ? styles.disabled : ""
-          }`}
-          folder={{ icon: allIcon, alt: "전체 폴더" }}
-          subs={datas.subs.items}
-        />
+      <Folder
+        className={`${styles.folder} ${styles.small} ${
+          mode === "move" ? styles.disabled : ""
+        } ${datas.currentFolder === 0 ? styles.selected : null}`}
+        folder={{ icon: allIcon, alt: "전체 폴더" }}
+        subs={datas.subs.items}
+      />
 
-        {datas.folders.map((folder) => {
-          const subs = datas.subs.items.filter(
-            (sub) => sub?.folder?.id === folder.id
-          );
+      {datas.folders.map((folder) => {
+        const subs = datas.subs.items.filter(
+          (sub) => sub?.folder?.id === folder.id
+        );
 
-          return (
-            <Folder
-              key={folder.id}
-              className={`${styles.folder} ${
-                mode === "move" && folder.id === datas.currentFolder
-                  ? styles.selected
-                  : null
-              }`}
-              folder={folder}
-              subs={subs}
-            />
-          );
-        })}
-      </div>
-    );
-  }
+        return (
+          <Folder
+            key={folder.id}
+            className={`${styles.folder} ${
+              folder.id === datas.currentFolder ? styles.selected : null
+            }`}
+            folder={folder}
+            subs={subs}
+          />
+        );
+      })}
+    </div>
+  );
 });
 
 export default Folders;

@@ -1,4 +1,11 @@
-import { useEffect, useState, createContext, useContext } from "react";
+import {
+  useEffect,
+  useState,
+  createContext,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 
 import { useUtil } from "../providers/UtilContext";
 
@@ -23,61 +30,73 @@ const MainProvider = ({ children }) => {
   const { executeFetch } = useUtil();
   const [datas, setDatas] = useState({
     folders: [],
-    subs: [],
+    subs: {},
     currentFolder: 0,
     currentSubs: [],
   });
 
   const [mode, setMode] = useState("read");
 
-  const selectFolder = async () => {
+  const selectFolder = useCallback(async () => {
     const folders = await executeFetch({
       method: "GET",
       path: "subs/folders/",
     });
 
     return folders;
-  };
+  }, [executeFetch]);
 
-  const deleteFolder = async (folderId) => {
-    await executeFetch({
-      method: "DELETE",
-      path: `subs/folder/${folderId}`,
-    });
-  };
+  const deleteFolder = useCallback(
+    async (folderId) => {
+      await executeFetch({
+        method: "DELETE",
+        path: `subs/folder/${folderId}`,
+      });
+    },
+    [executeFetch]
+  );
 
-  const createFolder = async (data) => {
-    const result = await executeFetch({
-      method: "POST",
-      path: "subs/folders/",
-      data: data,
-    });
+  const createFolder = useCallback(
+    async (data) => {
+      const result = await executeFetch({
+        method: "POST",
+        path: "subs/folders/",
+        data: data,
+      });
 
-    return result;
-  };
+      return result;
+    },
+    [executeFetch]
+  );
 
-  const selectSubs = async (folderId = 0) => {
-    const subs = await executeFetch({
-      method: "GET",
-      path: `subs/${folderId}`,
-    });
+  const selectSubs = useCallback(
+    async (folderId = 0, nextPageToken = "firstSearch") => {
+      const subs = await executeFetch({
+        method: "GET",
+        path: `subs/${folderId}/${nextPageToken}`,
+      });
 
-    return subs;
-  };
+      return subs;
+    },
+    [executeFetch]
+  );
+
+  const providerValue = useMemo(
+    () => ({
+      datas,
+      setDatas,
+      mode,
+      setMode,
+      selectFolder,
+      createFolder,
+      deleteFolder,
+      selectSubs,
+    }),
+    [createFolder, datas, deleteFolder, mode, selectFolder, selectSubs]
+  );
 
   return (
-    <MainContext.Provider
-      value={{
-        datas,
-        setDatas,
-        mode,
-        setMode,
-        selectFolder,
-        createFolder,
-        deleteFolder,
-        selectSubs,
-      }}
-    >
+    <MainContext.Provider value={providerValue}>
       {children}
     </MainContext.Provider>
   );
@@ -114,22 +133,30 @@ const Main = ({ className }) => {
     };
 
     getData();
-  }, [executeFetch]);
+  }, [executeFetch, setIsRunning, selectFolder, selectSubs, setDatas]);
 
   return (
     <>
       <div className={createStyleClass(styles, ["main"], className)}>
         <Folders className={styles.folders} />
 
-        {mode === "move" ? <h3>move</h3> : <Subs className={styles.subs} />}
+        {mode === "move" ? (
+          <h3>move</h3>
+        ) : (
+          <Subs className={styles.subsWrapper} />
+        )}
       </div>
       <Footer className={styles.footer} />
     </>
   );
 };
 
-export default ({ className }) => (
-  <MainProvider>
-    <Main className={className} />
-  </MainProvider>
-);
+const MainComponent = ({ className }) => {
+  return (
+    <MainProvider>
+      <Main className={className} />
+    </MainProvider>
+  );
+};
+
+export default MainComponent;
