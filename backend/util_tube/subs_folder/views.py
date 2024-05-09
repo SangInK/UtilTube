@@ -9,6 +9,9 @@ from utils.auth.CredentialsService import CredentialsService
 from .models import Folder, Subscription
 from .serializers import FolderSerializer, SubscriptionSerializer
 
+# google 구독 채널 조회 시 한 번에 조회할 채널의 수
+MAX_RESULT = 25
+
 
 class folders(APIView):
     def get(self, request):
@@ -71,9 +74,21 @@ class subscription(APIView):
 
 
 class subscriptions(APIView):
-    def get(self, request, pk):
+    def get(self, request, pk, nextToken):
         if "credentials" in request.session:
             subs = _get_subscriptions(request, pk)
+
+            while (
+                nextToken != "firstSearch"
+                and nextToken != str(MAX_RESULT)
+                and "nextPageToken" in subs["page_info"]
+            ):
+                subs_temp = _get_subscriptions(
+                    request, pk, subs["page_info"]["nextPageToken"]
+                )
+
+                subs["page_info"] = subs_temp["page_info"]
+                subs["items"] = subs["items"] + subs_temp["items"]
 
             return Response(subs, status=status.HTTP_200_OK)
         else:
@@ -134,8 +149,7 @@ def _update_credentials(request):
     return credentials
 
 
-def _get_subscriptions(request, pk):
-    max_result = 25
+def _get_subscriptions(request, pk, nextToken=""):
 
     credentials = _update_credentials(request)
 
@@ -143,7 +157,7 @@ def _get_subscriptions(request, pk):
 
     subscriptions = (
         youtube.subscriptions()
-        .list(part="id,snippet", maxResults=max_result, mine=True)
+        .list(part="id,snippet", maxResults=MAX_RESULT, mine=True, pageToken=nextToken)
         .execute()
     )
 
