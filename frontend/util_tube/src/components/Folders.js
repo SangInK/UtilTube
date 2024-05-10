@@ -28,9 +28,10 @@ const Folder = ({ className, folder, subs }) => {
 
   const handleClickFolder = async (e) => {
     e.preventDefault();
-    setIsRunning(true);
 
     if (isMouseOver) return;
+
+    setIsRunning(true);
 
     if (folderType === "folder") {
       setDatas((current) => ({
@@ -41,25 +42,6 @@ const Folder = ({ className, folder, subs }) => {
     } else if (folderType === "all") {
       if (mode === "read") {
         const newSubs = await selectSubs();
-
-        // setDatas((current) => {
-        //   debugger;
-        //   // if (current.subs.items.length === newSubs.items.length) {
-        //   //   newSubs.items = current.subs.items;
-        //   // }
-
-        //   newSubs.items =
-        //     current.subs.items.length < newSubs.items.length
-        //       ? current.subs.items
-        //       : newSubs.items;
-
-        //   return {
-        //     ...current,
-        //     subs: { ...newSubs },
-        //     currentFolder: 0,
-        //     currentSubs: [...newSubs.items],
-        //   };
-        // });
 
         setDatas((current) => ({
           ...current,
@@ -74,6 +56,11 @@ const Folder = ({ className, folder, subs }) => {
       }
     } else if (folderType === "move") {
       if (mode === "read") {
+        if (datas.folders.length <= 0) {
+          setIsRunning(false);
+          return;
+        }
+
         setMode((current) => (current === "read" ? "move" : "read"));
 
         setDatas((current) => {
@@ -104,9 +91,11 @@ const Folder = ({ className, folder, subs }) => {
   };
 
   const handleClickDelete = async (e) => {
+    e.preventDefault();
+    if (mode === "move") return;
+
     setIsRunning(true);
 
-    debugger;
     const folderId = folder.id;
 
     await deleteFolder(folderId);
@@ -150,6 +139,7 @@ const Folder = ({ className, folder, subs }) => {
           onClick={handleClickDelete}
           onMouseOver={handleMouseEvent}
           onMouseLeave={handleMouseEvent}
+          className={`${mode === "move" ? styles.disabled : ""}`}
         >
           <img src={deleteIcon} alt="폴더 삭제" />
         </button>

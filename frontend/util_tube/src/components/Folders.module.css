@@ -138,7 +138,7 @@
 }
 
 .folders .folder.selected {
-    border-color: gray;
+    border: 3px solid gray
 }
 /*#endregion */
 

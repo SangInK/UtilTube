@@ -13,6 +13,7 @@ import styles from "./Main.module.css";
 
 import Folders from "./Folders";
 import Subs from "./Subs";
+import SubsMove from "./SubsMove";
 import Footer from "./Footer";
 
 const MainContext = createContext({
@@ -141,7 +142,7 @@ const Main = ({ className }) => {
         <Folders className={styles.folders} />
 
         {mode === "move" ? (
-          <h3>move</h3>
+          <SubsMove className={styles.subsWrapper} />
         ) : (
           <Subs className={styles.subsWrapper} />
         )}

@@ -77,10 +77,8 @@ const Subs = memo(({ className }) => {
         })}
       </div>
       {datas.subs.pageInfo?.nextPageToken && (
-        <div className={styles.buttonDiv}>
-          <div className={styles.button} onClick={handleClickButton}>
-            더보기
-          </div>
+        <div className={styles.button} onClick={handleClickButton}>
+          더보기
         </div>
       )}
     </div>
