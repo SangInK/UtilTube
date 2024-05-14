@@ -55,6 +55,8 @@
 .subsMove .subsWrapper .subDiv button.openLink img {
     height: 20px;
     width: 20px;
+
+    cursor: pointer;
 }
 
 .subsMove .subsWrapper .subDiv .sub {

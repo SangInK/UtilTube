@@ -74,13 +74,12 @@ const Subs = ({ className, subs, onClickSubs, selectedSubs }) => {
 };
 
 const SubsMove = ({ className }) => {
-  const { createStyleClass } = useUtil();
-  const { datas, setDatas } = useMain();
+  const { createStyleClass, setIsRunning } = useUtil();
+  const { datas, setDatas, insertSubs, deleteSubs } = useMain();
 
   const [selectedSubs, setSelectedSubs] = useState({ add: [], delete: [] });
 
   const handleClickAddSubs = (sub) => {
-    debugger;
     setSelectedSubs((current) => {
       if (current.add.findIndex((item) => item.subs_id === sub.subs_id) >= 0) {
         return {
@@ -111,24 +110,66 @@ const SubsMove = ({ className }) => {
   };
 
   const handleClickAdd = async () => {
-    setDatas((current) => ({
-      ...current,
-      currentSubs: [...current.currentSubs, ...selectedSubs.add],
-    }));
+    setIsRunning(true);
+    const result = await insertSubs(datas.currentFolder, selectedSubs.add);
+
+    if (result.isOk) {
+      setDatas((current) => ({
+        ...current,
+        subs: {
+          ...current.subs,
+          items: [
+            ...current.subs.items.filter((item) => {
+              return !result.subs.some((subs) => item.subs_id === subs.subs_id);
+            }),
+            ...result.subs,
+          ],
+        },
+        currentSubs: [...current.currentSubs, ...selectedSubs.add],
+      }));
+    }
+
+    setSelectedSubs((current) => ({ ...current, add: [] }));
+    setIsRunning(false);
   };
 
   const handleClickDelete = async () => {
-    debugger;
-    setDatas((current) => ({
-      ...current,
-      currentSubs: [
-        ...current.currentSubs.filter((item) => {
-          return !selectedSubs.delete.some(
-            (selectedSub) => item.subs_id === selectedSub.subs_id
-          );
-        }),
-      ],
-    }));
+    setIsRunning(true);
+    const result = await deleteSubs(datas.currentFolder, selectedSubs.delete);
+
+    if (result.isOk) {
+      setDatas((current) => ({
+        ...current,
+        subs: {
+          ...current.subs,
+          items: [
+            ...current.subs.items.filter((item) => {
+              return !selectedSubs.delete.some(
+                (sub) => item.subs_id === sub.subs_id
+              );
+            }),
+            ...selectedSubs.delete.map((item) => {
+              return {
+                subs_id: item.subs_id,
+                title: item.title,
+                description: item.description,
+                thumbnails: item.thumbnails,
+              };
+            }),
+          ],
+        },
+        currentSubs: [
+          ...current.currentSubs.filter((item) => {
+            return !selectedSubs.delete.some(
+              (sub) => item.subs_id === sub.subs_id
+            );
+          }),
+        ],
+      }));
+    }
+
+    setSelectedSubs((current) => ({ ...current, delete: [] }));
+    setIsRunning(false);
   };
 
   return (

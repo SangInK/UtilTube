@@ -25,6 +25,8 @@ const MainContext = createContext({
   createFolder: () => {},
   deleteFolder: () => {},
   selectSubs: () => {},
+  insertSubs: () => {},
+  deleteSubs: () => {},
 });
 
 const MainProvider = ({ children }) => {
@@ -74,13 +76,33 @@ const MainProvider = ({ children }) => {
     async (folderId = 0, nextPageToken = "firstSearch") => {
       const subs = await executeFetch({
         method: "GET",
-        path: `subs/${folderId}/${nextPageToken}`,
+        path: `subs/${folderId}/${nextPageToken}/`,
       });
 
       return subs;
     },
     [executeFetch]
   );
+
+  const insertSubs = useCallback(async (currentFolder, selectedSubs) => {
+    const subs = await executeFetch({
+      method: "POST",
+      path: `subs/${currentFolder}/empty/`,
+      data: selectedSubs,
+    });
+
+    return subs;
+  }, []);
+
+  const deleteSubs = useCallback(async (currentFolder, selectedSubs) => {
+    const subs = await executeFetch({
+      method: "DELETE",
+      path: `subs/${currentFolder}/empty/`,
+      data: selectedSubs,
+    });
+
+    return subs;
+  }, []);
 
   const providerValue = useMemo(
     () => ({
@@ -92,8 +114,19 @@ const MainProvider = ({ children }) => {
       createFolder,
       deleteFolder,
       selectSubs,
+      insertSubs,
+      deleteSubs,
     }),
-    [createFolder, datas, deleteFolder, mode, selectFolder, selectSubs]
+    [
+      createFolder,
+      datas,
+      deleteFolder,
+      mode,
+      selectFolder,
+      selectSubs,
+      insertSubs,
+      deleteSubs,
+    ]
   );
 
   return (

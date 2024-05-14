@@ -63,7 +63,16 @@ const Subs = memo(({ className }) => {
         pageInfo: { ...result.pageInfo },
         items: [...current.subs.items, ...result.items],
       },
-      currentSubs: [...current.currentSubs, ...result.items],
+      currentSubs: [
+        ...current.currentSubs,
+        ...result.items.filter(
+          (item) =>
+            item.folder?.id ===
+            (current.currentFolder === "youtube" || current.currentFolder === 0
+              ? undefined
+              : current.currentFolder)
+        ),
+      ],
     }));
 
     setIsRunning(false);
@@ -76,11 +85,12 @@ const Subs = memo(({ className }) => {
           return <Sub key={index} sub={item} />;
         })}
       </div>
-      {datas.subs.pageInfo?.nextPageToken && (
-        <div className={styles.button} onClick={handleClickButton}>
-          더보기
-        </div>
-      )}
+      {datas.subs.pageInfo?.nextPageToken &&
+        (datas.currentFolder === 0 || datas.currentFolder === "youtube") && (
+          <div className={styles.button} onClick={handleClickButton}>
+            더보기
+          </div>
+        )}
     </div>
   );
 });

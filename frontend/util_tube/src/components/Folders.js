@@ -10,6 +10,7 @@ import allIcon from "../assets/Folder/icons8-select-all-30.png";
 import deleteIcon from "../assets/Folder/icons8-delete-folder-30.png";
 import moveIcon from "../assets/Folder/icons8-move-stock-30.png";
 import cancelIcon from "../assets/Folder/icons8-cancel-30.png";
+import youtubeIcon from "../assets/Folder/icons8-youtube-30.png";
 
 const Folder = ({ className, folder, subs }) => {
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -22,6 +23,8 @@ const Folder = ({ className, folder, subs }) => {
     ? "folder"
     : folder.icon === addIcon
     ? "plus"
+    : folder.icon === youtubeIcon
+    ? "youtube"
     : folder.icon === moveIcon || folder.icon === cancelIcon
     ? "move"
     : "all";
@@ -54,6 +57,14 @@ const Folder = ({ className, folder, subs }) => {
       if (mode === "read") {
         setMode((current) => (current === "read" ? "create" : "read"));
       }
+    } else if (folderType === "youtube") {
+      if (mode === "read") {
+        setDatas((current) => ({
+          ...current,
+          currentFolder: "youtube",
+          currentSubs: [...subs],
+        }));
+      }
     } else if (folderType === "move") {
       if (mode === "read") {
         if (datas.folders.length <= 0) {
@@ -65,12 +76,12 @@ const Folder = ({ className, folder, subs }) => {
 
         setDatas((current) => {
           const currentFolder =
-            current.currentFolder === 0
+            current.currentFolder === 0 || current.currentFolder === "youtube"
               ? current.folders[0]?.id ?? 0
               : current.currentFolder;
 
           const currentSubs =
-            current.currentFolder === 0
+            current.currentFolder === 0 || current.currentFolder === "youtube"
               ? current.subs.items.filter(
                   (item) => item.folder?.id === currentFolder
                 )
@@ -114,6 +125,24 @@ const Folder = ({ className, folder, subs }) => {
           ...current.folders.slice(0, deleteIndex),
           ...current.folders.slice(deleteIndex + 1),
         ],
+        subs: {
+          ...current.subs,
+          items: [
+            ...current.subs.items.filter(
+              (item) => item.folder?.id !== folderId
+            ),
+            ...current.subs.items
+              .filter((item) => item.folder?.id === folderId)
+              .map((item) => {
+                return {
+                  subs_id: item.subs_id,
+                  title: item.title,
+                  description: item.description,
+                  thumbnails: item.thumbnails,
+                };
+              }),
+          ],
+        },
         currentFolder: checkCurrentFolder ? current.currentFolder : 0,
         currentSubs: checkCurrentFolder
           ? current.currentSubs
@@ -151,7 +180,9 @@ const Folder = ({ className, folder, subs }) => {
         <img src={folder.icon} alt={folder.alt} />
       )}
 
-      {folderType === "folder" || folderType === "all" ? (
+      {folderType === "folder" ||
+      folderType === "all" ||
+      folderType === "youtube" ? (
         <p className={styles.folderInfo}>
           {folderType === "all" && "총"}채널수: {subs?.length}
         </p>
@@ -247,6 +278,17 @@ const Folders = memo(({ className }) => {
         } ${datas.currentFolder === 0 ? styles.selected : null}`}
         folder={{ icon: allIcon, alt: "전체 폴더" }}
         subs={datas.subs.items}
+      />
+
+      <Folder
+        className={`${styles.folder} ${styles.small} ${
+          mode === "move" ? styles.disabled : ""
+        } ${datas.currentFolder === "youtube" ? styles.selected : null}`}
+        folder={{ icon: youtubeIcon, alt: "youtube 폴더" }}
+        subs={
+          datas.subs.items &&
+          datas.subs.items.filter((item) => item?.folder === undefined)
+        }
       />
 
       {datas.folders.map((folder) => {
