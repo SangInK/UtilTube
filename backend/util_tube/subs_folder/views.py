@@ -100,7 +100,7 @@ class subscriptions(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, pk):
+    def post(self, request, pk, nextToken):
         # 이미 입력된 구독채널이 있으면 삭제
         data = [data for data in request.data if "folder" in data]
 
@@ -126,17 +126,17 @@ class subscriptions(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
-        subs = _get_subscriptions(request, 0)
+        return Response(
+            {"isOk": True, "subs": serializer.data}, status=status.HTTP_200_OK
+        )
 
-        return Response({"isOk": True, "data": subs}, status=status.HTTP_200_OK)
-
-    def delete(self, request, pk):
+    def delete(self, request, pk, nextToken):
         try:
             filter = Q(folder=pk)
             filter_channel_id = Q()
 
-            for subs_channel_id in request.data["subs"]:
-                filter_channel_id |= Q(subs_channel_id=subs_channel_id)
+            for subs in request.data:
+                filter_channel_id |= Q(subs_id=subs["subs_id"])
 
             filter &= filter_channel_id
 
@@ -155,7 +155,7 @@ def _update_credentials(request):
     return credentials
 
 
-def _get_subscriptions(request, pk, nextToken):
+def _get_subscriptions(request, pk, nextToken=""):
 
     credentials = _update_credentials(request)
 
@@ -167,41 +167,27 @@ def _get_subscriptions(request, pk, nextToken):
         .execute()
     )
 
-    subs = {
-        "pageInfo": {
-            **subscriptions["pageInfo"],
-            **{"nextPageToken": subscriptions["nextPageToken"]},
+    subs = {"pageInfo": subscriptions.get("pageInfo", {})}
+    subs["pageInfo"]["nextPageToken"] = subscriptions.get("nextPageToken", "")
+
+    my_subs = Subscription.objects.all()
+    serializer = SubscriptionSerializer(my_subs, many=True)
+
+    subs["items"] = serializer.data if nextToken == "" else []
+
+    for item in [
+        item["snippet"]
+        for item in subscriptions["items"]
+        if item["snippet"]["resourceId"]["channelId"]
+        not in [item["subs_id"] for item in serializer.data]
+    ]:
+        subs_temp = {
+            "subs_id": item["resourceId"]["channelId"],
+            "title": item["title"],
+            "description": item["description"],
+            "thumbnails": item["thumbnails"]["default"]["url"],
         }
-    }
 
-    if pk == 0:
-        subs["items"] = []
-        my_subs = Subscription.objects.all()
-
-        serializer = SubscriptionSerializer(my_subs, many=True)
-        my_subs = serializer.data
-
-        for item in [
-            item["snippet"]
-            for item in subscriptions["items"]
-            if item["snippet"]["resourceId"]["channelId"]
-            not in [item["subs_id"] for item in my_subs]
-        ]:
-            subs_temp = {
-                "subs_id": item["resourceId"]["channelId"],
-                "title": item["title"],
-                "description": item["description"],
-                "thumbnails": item["thumbnails"]["default"]["url"],
-            }
-
-            subs["items"].append(subs_temp)
-
-        subs["items"] = my_subs + subs["items"]
-
-    else:
-        subs["items"] = Subscription.objects.filter(folder=pk)
-
-        serializer = SubscriptionSerializer(subs["items"], many=True)
-        subs["items"] = serializer.data
+        subs["items"].append(subs_temp)
 
     return subs
