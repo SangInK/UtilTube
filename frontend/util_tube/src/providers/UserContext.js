@@ -84,6 +84,7 @@ export const UserProvider = ({ children }) => {
    * Google 인증이 완료되지 않은 상태면 Google 인증을 위한 인증화면 팝업
    */
   const userLogin = useCallback(async () => {
+    debugger;
     const resultType = "user";
 
     const result = await callExecuteFetch({

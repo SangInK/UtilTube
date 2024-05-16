@@ -11,6 +11,9 @@ import { useState } from "react";
 const Sub = ({ sub, onClickSubs, selectedSubs }) => {
   const [isMouseOver, setIsMouseOver] = useState(false);
 
+  const selectedCheck =
+    selectedSubs.findIndex((item) => item.subs_id === sub.subs_id) >= 0;
+
   const handleMouseEvent = (e) => {
     setIsMouseOver(e.type === "mouseover" ? true : false);
   };
@@ -30,11 +33,7 @@ const Sub = ({ sub, onClickSubs, selectedSubs }) => {
   return (
     <div className={styles.subDiv} onClick={handleClickSubs}>
       <div
-        className={`${styles.sub} ${
-          selectedSubs.findIndex((item) => item.subs_id === sub.subs_id) >= 0
-            ? styles.selected
-            : ""
-        }`}
+        className={`${styles.sub} ${selectedCheck ? styles.selected : ""}`}
         title={sub.description}
       >
         <button
@@ -56,19 +55,22 @@ const Sub = ({ sub, onClickSubs, selectedSubs }) => {
   );
 };
 
-const Subs = ({ className, subs, onClickSubs, selectedSubs }) => {
+const Subs = ({ className, type, subs, onClickSubs, selectedSubs }) => {
   return (
     <div className={className}>
-      {subs.map((item, index) => {
-        return (
-          <Sub
-            key={index}
-            sub={item}
-            onClickSubs={onClickSubs}
-            selectedSubs={selectedSubs}
-          />
-        );
-      })}
+      <div>
+        {subs.map((item, index) => {
+          return (
+            <Sub
+              key={index}
+              sub={item}
+              onClickSubs={onClickSubs}
+              selectedSubs={selectedSubs}
+            />
+          );
+        })}
+      </div>
+      {type === "unmoved" ? <div className={styles.button}>더보기</div> : null}
     </div>
   );
 };
@@ -176,6 +178,7 @@ const SubsMove = ({ className }) => {
     <div className={createStyleClass(styles, ["subsMove"], className)}>
       <Subs
         className={styles.subsWrapper}
+        type="unmoved"
         subs={datas.subs.items.filter((item) => item.folder === undefined)}
         onClickSubs={handleClickAddSubs}
         selectedSubs={selectedSubs.add}
@@ -190,6 +193,7 @@ const SubsMove = ({ className }) => {
       </div>
       <Subs
         className={styles.subsWrapper}
+        type="moved"
         subs={datas.currentSubs}
         onClickSubs={handleClickDeleteSubs}
         selectedSubs={selectedSubs.delete}

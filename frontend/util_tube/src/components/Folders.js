@@ -11,6 +11,7 @@ import deleteIcon from "../assets/Folder/icons8-delete-folder-30.png";
 import moveIcon from "../assets/Folder/icons8-move-stock-30.png";
 import cancelIcon from "../assets/Folder/icons8-cancel-30.png";
 import youtubeIcon from "../assets/Folder/icons8-youtube-30.png";
+import refreshIcon from "../assets/Folder/icons8-refresh-30.png";
 
 const Folder = ({ className, folder, subs }) => {
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -29,7 +30,7 @@ const Folder = ({ className, folder, subs }) => {
     ? "move"
     : "all";
 
-  const handleClickFolder = async (e) => {
+  const handleClickFolder = (e) => {
     e.preventDefault();
 
     if (isMouseOver) return;
@@ -44,13 +45,10 @@ const Folder = ({ className, folder, subs }) => {
       }));
     } else if (folderType === "all") {
       if (mode === "read") {
-        const newSubs = await selectSubs();
-
         setDatas((current) => ({
           ...current,
-          subs: { ...newSubs },
           currentFolder: 0,
-          currentSubs: [...newSubs.items],
+          currentSubs: [...current.subs.items],
         }));
       }
     } else if (folderType === "plus") {
@@ -97,6 +95,23 @@ const Folder = ({ className, folder, subs }) => {
         setMode((current) => (current === "read" ? "move" : "read"));
       }
     }
+
+    setIsRunning(false);
+  };
+
+  const handleClickRefresh = async (e) => {
+    if (mode === "move") return;
+
+    setIsRunning(true);
+
+    const result = await selectSubs();
+
+    setDatas((current) => ({
+      ...current,
+      subs: { ...result },
+      currentFolder: 0,
+      currentSubs: [...result.items],
+    }));
 
     setIsRunning(false);
   };
@@ -171,6 +186,17 @@ const Folder = ({ className, folder, subs }) => {
           className={`${mode === "move" ? styles.disabled : ""}`}
         >
           <img src={deleteIcon} alt="폴더 삭제" />
+        </button>
+      ) : null}
+      {folderType === "all" ? (
+        <button
+          title="구독채널 새로고침"
+          onClick={handleClickRefresh}
+          onMouseOver={handleMouseEvent}
+          onMouseLeave={handleMouseEvent}
+          className={`${mode === "move" ? styles.disabled : ""}`}
+        >
+          <img src={refreshIcon} alt="구독채널 새로고침" />
         </button>
       ) : null}
 

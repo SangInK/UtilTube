@@ -72,6 +72,9 @@
 .subs .subDiv .sub img {
     border: 1px solid #dddddd;
     border-radius: 999px;
+
+    max-height: 90px;
+    max-width: 90px;
 }
 
 .subs .subDiv .sub .contentDiv {

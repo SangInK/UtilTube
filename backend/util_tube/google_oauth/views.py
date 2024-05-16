@@ -146,7 +146,6 @@ class google_oauth(APIView):
                 request.session["google_oauth2_state"] = state
 
                 return Response({"authorization_url": authorization_url})
-            pass
         except Exception as e:
             response.status_code = status.HTTP_400_BAD_REQUEST
 

@@ -13,6 +13,35 @@
     overflow-y: auto;
 
     padding: 0.5rem;
+
+    position: relative;
+}
+
+.subsMove .subsWrapper .button {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+
+    transform: translate(-50%, 0rem);
+
+    width: 100px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid #dddddd;
+    border-radius: 15px;
+
+    background-color: #ffffff;
+    filter: opacity(0.5);
+}
+
+.subsMove .subsWrapper .button:hover {
+    filter: opacity(1);
+
+    cursor: pointer;
 }
 
 .subsMove .subsWrapper .subDiv {
@@ -25,6 +54,12 @@
 
     position: relative;
 }
+
+
+.subsMove .subsWrapper .subDiv.selected > div {
+    border: 3px solid gray
+}
+
 
 .subsMove .subsWrapper .subDiv button.openLink {
     position: absolute;
@@ -55,6 +90,9 @@
 .subsMove .subsWrapper .subDiv button.openLink img {
     height: 20px;
     width: 20px;
+
+    max-height: 20px;
+    max-width: 20px;
 
     cursor: pointer;
 }
@@ -134,5 +172,10 @@
     justify-content: center;
 
     gap: 2rem;
+    
+    user-select: none;
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, Opera */
+    -ms-user-select: none; /* Internet Explorer/Edge */
 }
 /*#endregion button wrapper*/
