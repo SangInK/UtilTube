@@ -172,7 +172,7 @@ const Main = ({ className }) => {
   return (
     <>
       <div className={createStyleClass(styles, ["main"], className)}>
-        <Folders className={styles.folders} />
+        <Folders className={styles.foldersWrapper} />
 
         {mode === "move" ? (
           <SubsMove className={styles.subsWrapper} />

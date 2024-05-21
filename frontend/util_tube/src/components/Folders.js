@@ -44,7 +44,7 @@ const Folder = ({ className, folder, subs }) => {
         currentSubs: [...subs],
       }));
     } else if (folderType === "all") {
-      if (mode === "read") {
+      if (mode === "create" || mode === "read") {
         setDatas((current) => ({
           ...current,
           currentFolder: 0,
@@ -56,7 +56,7 @@ const Folder = ({ className, folder, subs }) => {
         setMode((current) => (current === "read" ? "create" : "read"));
       }
     } else if (folderType === "youtube") {
-      if (mode === "read") {
+      if (mode === "create" || mode === "read") {
         setDatas((current) => ({
           ...current,
           currentFolder: "youtube",
@@ -271,6 +271,41 @@ const FolderForm = ({ className }) => {
 };
 
 const Folders = memo(({ className }) => {
+  const { createStyleClass } = useUtil();
+  const { datas, mode } = useMain();
+
+  return (
+    <div className={className}>
+      <div className={`${styles.folders} ${styles.buttonFolders}`}>
+        {mode === "read" || mode === "move" ? (
+          <div className={styles.buttonDiv}>
+            <Folder
+              className={`${styles.folderButton} ${
+                mode === "move" ? styles.disabled : ""
+              }`}
+              folder={{ icon: addIcon, alt: "폴더 추가" }}
+            />
+            <Folder
+              className={`${styles.folderButton} ${
+                datas.folders.length <= 0 ? styles.disabled : ""
+              }`}
+              folder={{
+                icon: mode === "read" ? moveIcon : cancelIcon,
+                alt: mode === "read" ? "채널 이동 모드" : "취소",
+              }}
+            />
+          </div>
+        ) : (
+          <FolderForm className={styles.folderForm} />
+        )}
+      </div>
+
+      <div className={styles.folders}></div>
+    </div>
+  );
+});
+
+const Folders2 = memo(({ className }) => {
   const { createStyleClass } = useUtil();
   const { datas, mode } = useMain();
 

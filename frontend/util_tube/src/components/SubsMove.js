@@ -55,10 +55,39 @@ const Sub = ({ sub, onClickSubs, selectedSubs }) => {
   );
 };
 
-const Subs = ({ className, type, subs, onClickSubs, selectedSubs }) => {
+const Subs = ({ type, subs, onClickSubs, selectedSubs }) => {
+  const { datas, setDatas, selectSubs } = useMain();
+  const { setIsRunning } = useUtil();
+
+  const handleClickButton = async (e) => {
+    setIsRunning(true);
+
+    const result = await selectSubs(0, datas.subs.pageInfo?.nextPageToken);
+
+    setDatas((current) => ({
+      ...current,
+      subs: {
+        pageInfo: { ...result.pageInfo },
+        items: [...current.subs.items, ...result.items],
+      },
+      currentSubs: [
+        ...current.currentSubs,
+        ...result.items.filter(
+          (item) =>
+            item.folder?.id ===
+            (current.currentFolder === "youtube" || current.currentFolder === 0
+              ? undefined
+              : current.currentFolder)
+        ),
+      ],
+    }));
+
+    setIsRunning(false);
+  };
+
   return (
-    <div className={className}>
-      <div>
+    <div className={styles.subsWrapper}>
+      <div className={styles.subs}>
         {subs.map((item, index) => {
           return (
             <Sub
@@ -70,7 +99,11 @@ const Subs = ({ className, type, subs, onClickSubs, selectedSubs }) => {
           );
         })}
       </div>
-      {type === "unmoved" ? <div className={styles.button}>더보기</div> : null}
+      {type === "unmoved" ? (
+        <div className={styles.button} onClick={handleClickButton}>
+          더보기
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -177,7 +210,6 @@ const SubsMove = ({ className }) => {
   return (
     <div className={createStyleClass(styles, ["subsMove"], className)}>
       <Subs
-        className={styles.subsWrapper}
         type="unmoved"
         subs={datas.subs.items.filter((item) => item.folder === undefined)}
         onClickSubs={handleClickAddSubs}
@@ -192,7 +224,6 @@ const SubsMove = ({ className }) => {
         </div>
       </div>
       <Subs
-        className={styles.subsWrapper}
         type="moved"
         subs={datas.currentSubs}
         onClickSubs={handleClickDeleteSubs}

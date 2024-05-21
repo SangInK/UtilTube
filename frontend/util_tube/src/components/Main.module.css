@@ -6,21 +6,24 @@
     width: 100vw;
 }
 
-.folders {
+.foldersWrapper {
     flex-basis: 120px;
     flex-shrink: 0;
     flex-grow: 0;
 
     margin-top: 5px;
     padding: 0 0.5rem;
+    
+    display: flex;
 }
 
 .subsWrapper {
     width: 100vw;
-
     height: calc(100% - 120px);
 
     padding: 20px 0.5rem 10px 0.5rem;
+
+    position: relative;
 }
 
 .footer {

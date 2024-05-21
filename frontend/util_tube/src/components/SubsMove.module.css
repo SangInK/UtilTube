@@ -10,11 +10,16 @@
     border: 2px solid #dddddd;
     border-radius: 5px;
 
-    overflow-y: auto;
-
     padding: 0.5rem;
 
     position: relative;
+}
+
+.subsMove .subsWrapper .subs {
+    width: 100%;
+    height: 100%;
+
+    overflow-y: auto;
 }
 
 .subsMove .subsWrapper .button {
