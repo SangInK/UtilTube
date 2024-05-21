@@ -25,3 +25,62 @@
 
     cursor: pointer;
 }
+
+
+/*#region 아이콘 클릭 시 팝업*/
+.navbar .end {
+    position: relative;
+}
+
+.navbar .end .buttonDiv {
+    position: absolute;
+
+    right: 15px;
+    top: 40px;
+
+    border: 2px solid #dddddd;
+    border-radius: 5px;
+    
+    background-color: white;
+    
+    z-index: 15;
+}
+
+.navbar .end .buttonDiv .button {
+    width: 200px;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+
+    padding: 0 1.5rem;
+
+    cursor:pointer;
+
+    position: relative
+}
+
+.navbar .end .buttonDiv .button.borderBottom {
+    border-bottom: 2px solid #dddddd;
+}
+
+.navbar .end .buttonDiv .button div {
+    flex-grow: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar .end .buttonDiv .button img {
+    width: 25px;
+    height: 25px;
+
+    border-radius: 0;
+}
+
+/*#endregion*/
