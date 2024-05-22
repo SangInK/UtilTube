@@ -5,12 +5,14 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # localhost:8000을 https로 변경하기 위해 ngrok와 연결
-BASE_BACKEND_URL = os.getenv(
-    "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
-)
+# BASE_BACKEND_URL = os.getenv(
+#     "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
+# )
+BASE_BACKEND_URL = os.getenv("BASE_BACKEND_URL", "https://sai6272.shop:8080/")
 
 # util_tube backend를 사용할 client 측 프로그램의 url
-CLIENT_ORIGIN = "http://localhost:3000"
+# CLIENT_ORIGIN = "http://localhost:3000"
+CLINET_ORIGIN = "https://sangink.github.io"
 
 
 # Quick-start development settings - unsuitable for production
@@ -20,9 +22,16 @@ CLIENT_ORIGIN = "http://localhost:3000"
 SECRET_KEY = "django-insecure-0&mgxwbd-^@uf-pje8i!&$-6+a!*1th9q0_%jeid8@u-j=e=j)"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "liberal-chigger-blindly.ngrok-free.app"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "liberal-chigger-blindly.ngrok-free.app",
+    "sangink.github.io",
+    "43.203.71.112",  # AWS EC2
+    "sai6272.shop",  # gabia
+]
 
 
 # Application definition
@@ -50,6 +59,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://liberal-chigger-blindly.ngrok-free.app",
+    "https://sangink.github.io",
+    "https://sai6272.shop:8080",
 ]
 
 CORS_ALLOW_HEADERS = (
