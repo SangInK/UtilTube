@@ -1,4 +1,5 @@
-const BASE_URL = "https://liberal-chigger-blindly.ngrok-free.app/";
+// const BASE_URL = "https://liberal-chigger-blindly.ngrok-free.app/";
+const BASE_URL = "43.203.71.112/"; // AWS EC2
 
 export const executeFetch = async ({
   method = "POST",
