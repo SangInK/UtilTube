@@ -1,0 +1,15 @@
+[Unit]
+Description=uWSGI service
+After=syslog.target
+
+[Service]
+ExecStart=/home/ubuntu/util_tube_venv/bin/uwsgi -i /home/ubuntu/UtilTube/backend/util_tube/.config/uwsgi/UtilTube.ini
+
+Restart=always
+killSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
