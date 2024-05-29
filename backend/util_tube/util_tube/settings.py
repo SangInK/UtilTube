@@ -9,7 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #     "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
 # )
 
-BASE_BACKEND_URL = os.getenv("BASE_BACKEND_URL", "https://sai6272.shop:443/")
+BASE_BACKEND_URL = os.getenv(
+    "BASE_BACKEND_URL",
+    "http://ec2-3-38-23-218.ap-northeast-2.compute.amazonaws.com:8000/",
+)
 
 # util_tube backend를 사용할 client 측 프로그램의 url
 # CLIENT_ORIGIN = "http://localhost:3000"
@@ -30,7 +33,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "liberal-chigger-blindly.ngrok-free.app",
     "sangink.github.io",
-    "sai6272.shop",  # gabia
+    "ec2-3-38-23-218.ap-northeast-2.compute.amazonaws.com",  # gabia
 ]
 
 
@@ -60,7 +63,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://liberal-chigger-blindly.ngrok-free.app",
     "https://sangink.github.io",
-    "https://sai6272.shop:443",
+    "http://ec2-3-38-23-218.ap-northeast-2.compute.amazonaws.com:8000",
 ]
 
 CORS_ALLOW_HEADERS = (
