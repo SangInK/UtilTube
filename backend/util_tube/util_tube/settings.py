@@ -5,10 +5,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # localhost:8000을 https로 변경하기 위해 ngrok와 연결
-# BASE_BACKEND_URL = os.getenv(
-#     "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
-# )
-BASE_BACKEND_URL = os.getenv("BASE_BACKEND_URL", "https://sai6272.shop:8080/")
+BASE_BACKEND_URL = os.getenv(
+    "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
+)
+# BASE_BACKEND_URL = os.getenv("BASE_BACKEND_URL", "http://sai6272.shop:8000/")
 
 # util_tube backend를 사용할 client 측 프로그램의 url
 # CLIENT_ORIGIN = "http://localhost:3000"
@@ -29,7 +29,6 @@ ALLOWED_HOSTS = [
     "localhost",
     "liberal-chigger-blindly.ngrok-free.app",
     "sangink.github.io",
-    "43.203.71.112",  # AWS EC2
     "sai6272.shop",  # gabia
 ]
 
