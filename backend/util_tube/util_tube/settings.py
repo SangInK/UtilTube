@@ -21,7 +21,7 @@ BASE_BACKEND_URL = os.getenv(
 
 # util_tube backend를 사용할 client 측 프로그램의 url
 # CLIENT_ORIGIN = "http://localhost:3000"
-CLINET_ORIGIN = "https://sangink.github.io"
+CLINET_ORIGIN = "http://util-tube.s3-website.ap-northeast-2.amazonaws.com"
 
 
 # Quick-start development settings - unsuitable for production
@@ -66,7 +66,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CORS 설정 중 특정 출처에 대한 허용 여부
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://sangink.github.io",
+    "http://util-tube.s3-website.ap-northeast-2.amazonaws.com",
 ]
 
 CORS_ALLOW_HEADERS = (
