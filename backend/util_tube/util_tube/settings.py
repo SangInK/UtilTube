@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 BASE_BACKEND_URL = os.getenv(
     "BASE_BACKEND_URL",
-    "http://sai6272.show:8000/",
+    "https://sai6272.shop/",
 )
 
 # util_tube backend를 사용할 client 측 프로그램의 url
@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "liberal-chigger-blindly.ngrok-free.app",
     "sangink.github.io",
-    "sai6272.show",  # gabia
+    "sai6272.shop",  # gabia
 ]
 
 
