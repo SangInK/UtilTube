@@ -1,5 +1,5 @@
-const BASE_URL = "https://liberal-chigger-blindly.ngrok-free.app/";
-// const BASE_URL = "43.203.71.112/"; // AWS EC2
+// const BASE_URL = "https://liberal-chigger-blindly.ngrok-free.app/";
+const BASE_URL = "https://sai6272.shop/"; // AWS EC2 // gabia domain
 
 export const executeFetch = async ({
   method = "POST",
