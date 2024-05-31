@@ -17,7 +17,7 @@ const ButtonDiv = () => {
   };
 
   const handleClickRevoke = async () => {
-    //await userRevoke();
+    await userRevoke();
   };
 
   return (
