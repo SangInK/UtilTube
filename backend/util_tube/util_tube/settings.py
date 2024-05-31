@@ -5,13 +5,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # localhost:8000을 https로 변경하기 위해 ngrok와 연결
-# BASE_BACKEND_URL = os.getenv(
-#     "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
-# )
-
 BASE_BACKEND_URL = os.getenv(
-    "BASE_BACKEND_URL",
-    "http://ec2-43-203-233-86.ap-northeast-2.compute.amazonaws.com:8000/",
+    "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
 )
 
 # BASE_BACKEND_URL = os.getenv(
@@ -20,8 +15,8 @@ BASE_BACKEND_URL = os.getenv(
 # )
 
 # util_tube backend를 사용할 client 측 프로그램의 url
+CLIENT_ORIGIN = "https://front.sai6272.shop"
 # CLIENT_ORIGIN = "http://localhost:3000"
-CLINET_ORIGIN = "http://util-tube.s3-website.ap-northeast-2.amazonaws.com"
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,9 +32,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     "localhost",
     "liberal-chigger-blindly.ngrok-free.app",
-    "sangink.github.io",
     "sai6272.shop",  # gabia
-    "ec2-43-203-233-86.ap-northeast-2.compute.amazonaws.com",
 ]
 
 
@@ -65,10 +58,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CORS_ALLOW_ALL_ORIGINS = True
 
 # CORS 설정 중 특정 출처에 대한 허용 여부
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://util-tube.s3-website.ap-northeast-2.amazonaws.com",
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://front.sai6272.shop"]
 
 CORS_ALLOW_HEADERS = (
     "accept",

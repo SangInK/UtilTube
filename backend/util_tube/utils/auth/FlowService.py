@@ -8,7 +8,7 @@ import google_auth_oauthlib.flow
 
 
 class FlowService:
-    API_URI = "auth/redirect"
+    API_URI = "auth/redirect/"
 
     GOOGLE_CLIENT_TYPE = "web"
 
