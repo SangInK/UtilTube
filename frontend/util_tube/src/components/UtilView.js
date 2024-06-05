@@ -7,9 +7,11 @@ import styles from "./UtillView.module.css";
 
 const UtilView = ({ classArray }) => {
   const [queryString] = useSearchParams();
-  const { createStyleClass } = useUtil();
+  const { setIsRunning, createStyleClass } = useUtil();
 
   useEffect(() => {
+    setIsRunning(true);
+
     const authorizationUrl = localStorage.getItem("authorization_url");
     localStorage.removeItem("authorization_url");
 

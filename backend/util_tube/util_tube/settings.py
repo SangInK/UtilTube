@@ -6,19 +6,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # BASE_BACKEND_URL : DRF 도메인
 # 개발중 https 연결을 위한 ngrok url
-# BASE_BACKEND_URL = os.getenv(
-#     "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
-# )
-
 BASE_BACKEND_URL = os.getenv(
-    "BASE_BACKEND_URL",
-    "https://sai6272.shop/",  # gabia
+    "BASE_BACKEND_URL", "https://liberal-chigger-blindly.ngrok-free.app/"
 )
 
-
-# util_tube backend를 사용할 client 측 프로그램의 url
-CLIENT_ORIGIN = "https://front.sai6272.shop"  #  gabia
-# CLIENT_ORIGIN = "http://localhost:3000"   # 개발 react url
+CLIENT_ORIGIN = "http://localhost:3000"  # 개발 react url
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,11 +20,10 @@ CLIENT_ORIGIN = "https://front.sai6272.shop"  #  gabia
 SECRET_KEY = "django-insecure-0&mgxwbd-^@uf-pje8i!&$-6+a!*1th9q0_%jeid8@u-j=e=j)"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
-    # "liberal-chigger-blindly.ngrok-free.app", # 개발중 https 연결을 위한 ngrok url
-    "sai6272.shop",  # gabia
+    "liberal-chigger-blindly.ngrok-free.app",  # 개발중 https 연결을 위한 ngrok url
 ]
 
 
@@ -58,8 +49,8 @@ CORS_ALLOW_CREDENTIALS = True
 # CORS_ALLOW_ALL_ORIGINS = True
 
 # CORS 설정 중 특정 출처에 대한 허용 여부
-CORS_ALLOWED_ORIGINS = [  # "http://localhost:3000", # 개발 react url
-    "https://front.sai6272.shop"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # 개발 react url
 ]
 
 CORS_ALLOW_HEADERS = (
