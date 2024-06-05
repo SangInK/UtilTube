@@ -278,45 +278,47 @@ const Folders = memo(({ className }) => {
     <div className={className}>
       <div className={`${styles.folders} ${styles.buttonFolders}`}>
         {mode === "read" || mode === "move" ? (
-          <div className={styles.buttonDiv}>
+          <>
+            <div className={styles.buttonDiv}>
+              <Folder
+                className={`${styles.folderButton} ${
+                  mode === "move" ? styles.disabled : ""
+                }`}
+                folder={{ icon: addIcon, alt: "폴더 추가" }}
+              />
+              <Folder
+                className={`${styles.folderButton} ${
+                  datas.folders.length <= 0 ? styles.disabled : ""
+                }`}
+                folder={{
+                  icon: mode === "read" ? moveIcon : cancelIcon,
+                  alt: mode === "read" ? "채널 이동 모드" : "취소",
+                }}
+              />
+            </div>
+
             <Folder
-              className={`${styles.folderButton} ${
+              className={`${styles.folder} ${styles.small} ${
                 mode === "move" ? styles.disabled : ""
-              }`}
-              folder={{ icon: addIcon, alt: "폴더 추가" }}
+              } ${datas.currentFolder === 0 ? styles.selected : null}`}
+              folder={{ icon: allIcon, alt: "전체 폴더" }}
+              subs={datas.subs.items}
             />
+
             <Folder
-              className={`${styles.folderButton} ${
-                datas.folders.length <= 0 ? styles.disabled : ""
-              }`}
-              folder={{
-                icon: mode === "read" ? moveIcon : cancelIcon,
-                alt: mode === "read" ? "채널 이동 모드" : "취소",
-              }}
+              className={`${styles.folder} ${styles.small} ${
+                mode === "move" ? styles.disabled : ""
+              } ${datas.currentFolder === "youtube" ? styles.selected : null}`}
+              folder={{ icon: youtubeIcon, alt: "youtube 폴더" }}
+              subs={
+                datas.subs.items &&
+                datas.subs.items.filter((item) => item?.folder === undefined)
+              }
             />
-          </div>
+          </>
         ) : (
           <FolderForm className={styles.folderForm} />
         )}
-
-        <Folder
-          className={`${styles.folder} ${styles.small} ${
-            mode === "move" ? styles.disabled : ""
-          } ${datas.currentFolder === 0 ? styles.selected : null}`}
-          folder={{ icon: allIcon, alt: "전체 폴더" }}
-          subs={datas.subs.items}
-        />
-
-        <Folder
-          className={`${styles.folder} ${styles.small} ${
-            mode === "move" ? styles.disabled : ""
-          } ${datas.currentFolder === "youtube" ? styles.selected : null}`}
-          folder={{ icon: youtubeIcon, alt: "youtube 폴더" }}
-          subs={
-            datas.subs.items &&
-            datas.subs.items.filter((item) => item?.folder === undefined)
-          }
-        />
       </div>
 
       <div className={styles.folders}>
