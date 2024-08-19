@@ -170,7 +170,11 @@ def _get_subscriptions(request, pk, nextToken=""):
     subs = {"pageInfo": subscriptions.get("pageInfo", {})}
     subs["pageInfo"]["nextPageToken"] = subscriptions.get("nextPageToken", "")
 
-    my_subs = Subscription.objects.all()
+    my_subs = Subscription.objects.filter(
+        folder__in=Folder.objects.filter(
+            google_user_id=credentials.google_user.data["id"]
+        ).values_list("id", flat=True)
+    )
     serializer = SubscriptionSerializer(my_subs, many=True)
 
     subs["items"] = serializer.data if nextToken == "" else []
